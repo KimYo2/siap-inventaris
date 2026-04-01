@@ -8,6 +8,7 @@ use App\Models\Barang;
 use App\Models\HistoriPeminjaman;
 use App\Models\User;
 use App\Services\NotifikasiService;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -327,5 +328,51 @@ class HistoriController extends Controller
         ]);
 
         return redirect()->back()->with('success', 'Perpanjangan peminjaman ditolak.');
+    }
+
+    public function exportPdf(Request $request)
+    {
+        $filters  = $request->only(['status', 'search']);
+        $dateFrom = $request->input('date_from');
+        $dateTo   = $request->input('date_to');
+
+        $query = HistoriPeminjaman::query()
+            ->select([
+                'id', 'kode_barang', 'nup', 'nip_peminjam', 'nama_peminjam',
+                'status', 'waktu_pinjam', 'waktu_kembali', 'tanggal_jatuh_tempo',
+                'kondisi_awal', 'kondisi_kembali', 'catatan_kondisi',
+            ])
+            ->filter($filters);
+
+        if ($dateFrom) {
+            $query->where('waktu_pinjam', '>=', $dateFrom . ' 00:00:00');
+        }
+        if ($dateTo) {
+            $query->where('waktu_pinjam', '<=', $dateTo . ' 23:59:59');
+        }
+
+        $histori = $query->orderBy('waktu_pinjam', 'desc')->limit(500)->get();
+
+        $this->logAudit('export', 'histori_peminjaman', null, [
+            'date_from' => $dateFrom,
+            'date_to'   => $dateTo,
+            'format'    => 'pdf',
+            'rows'      => $histori->count(),
+        ]);
+
+        $generatedAt = Carbon::now('Asia/Jakarta');
+        $fromPart    = $dateFrom ? Carbon::parse($dateFrom)->format('d/m/Y') : null;
+        $toPart      = $dateTo   ? Carbon::parse($dateTo)->format('d/m/Y')   : null;
+
+        $pdf = Pdf::loadView('admin.histori.pdf', compact(
+            'histori', 'dateFrom', 'dateTo', 'fromPart', 'toPart', 'generatedAt', 'filters'
+        ))
+        ->setPaper('a4', 'landscape')
+        ->setOption('defaultFont', 'DejaVu Sans')
+        ->setOption('isHtml5ParserEnabled', true);
+
+        $filename = 'laporan_peminjaman_bmn_' . $generatedAt->format('Ymd_His') . '.pdf';
+
+        return $pdf->download($filename);
     }
 }

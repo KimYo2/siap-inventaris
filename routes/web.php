@@ -62,6 +62,7 @@ Route::middleware(['web', Authenticate::class])->group(function () {
         Route::post('/admin/histori/{id}/reject', [App\Http\Controllers\Admin\HistoriController::class, 'reject'])->name('admin.histori.reject');
         Route::post('/admin/histori/{id}/extend/approve', [App\Http\Controllers\Admin\HistoriController::class, 'approveExtension'])->name('admin.histori.extend.approve');
         Route::post('/admin/histori/{id}/extend/reject', [App\Http\Controllers\Admin\HistoriController::class, 'rejectExtension'])->name('admin.histori.extend.reject');
+        Route::get('/admin/histori/export-pdf', [App\Http\Controllers\Admin\HistoriController::class, 'exportPdf'])->name('admin.histori.export-pdf');
         Route::get('/admin/histori/export', [App\Http\Controllers\Admin\HistoriController::class, 'export'])->name('admin.histori.export');
 
         // Admin Stock Opname
@@ -70,6 +71,7 @@ Route::middleware(['web', Authenticate::class])->group(function () {
         Route::get('/admin/opname/{id}', [App\Http\Controllers\Admin\StockOpnameController::class, 'show'])->name('admin.opname.show');
         Route::post('/admin/opname/{id}/scan', [App\Http\Controllers\Admin\StockOpnameController::class, 'scan'])->name('admin.opname.scan');
         Route::post('/admin/opname/{id}/finish', [App\Http\Controllers\Admin\StockOpnameController::class, 'finish'])->name('admin.opname.finish');
+        Route::get('/admin/opname/{id}/export-pdf', [App\Http\Controllers\Admin\StockOpnameController::class, 'exportPdf'])->name('admin.opname.export-pdf');
         Route::get('/admin/opname/{id}/export', [App\Http\Controllers\Admin\StockOpnameController::class, 'export'])->name('admin.opname.export');
 
         // Admin User Management

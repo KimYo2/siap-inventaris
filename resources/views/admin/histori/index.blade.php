@@ -16,16 +16,26 @@
                     peminjaman barang BMN</p>
             </div>
 
-            <!-- Optional: Export Button Placeholder (Legacy had it) -->
-            <a href="{{ route('admin.histori.export', array_filter(array_merge(request()->query(), ['date_from' => $dateFrom ?? null, 'date_to' => $dateTo ?? null]), fn($v) => $v !== null && $v !== '')) }}"
-                class="bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-medium py-2 px-4 rounded-lg transition inline-flex items-center gap-2 shadow-sm text-sm">
-                <svg class="w-4 h-4 text-green-600 dark:text-green-400" fill="none" stroke="currentColor"
-                    viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
-                </svg>
-                Export CSV
-            </a>
+            <!-- Export Buttons -->
+            <div class="flex items-center gap-2">
+                <a href="{{ route('admin.histori.export', array_filter(array_merge(request()->query(), ['date_from' => $dateFrom ?? null, 'date_to' => $dateTo ?? null]), fn($v) => $v !== null && $v !== '')) }}"
+                    class="bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-medium py-2 px-4 rounded-lg transition inline-flex items-center gap-2 shadow-sm text-sm">
+                    <svg class="w-4 h-4 text-green-600 dark:text-green-400" fill="none" stroke="currentColor"
+                        viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                    </svg>
+                    Export CSV
+                </a>
+                <a href="{{ route('admin.histori.export-pdf', array_filter(array_merge(request()->query(), ['date_from' => $dateFrom ?? null, 'date_to' => $dateTo ?? null]), fn($v) => $v !== null && $v !== '')) }}"
+                    class="bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-lg transition inline-flex items-center gap-2 shadow-sm text-sm">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                    </svg>
+                    Export PDF
+                </a>
+            </div>
         </div>
 
         <!-- Filters -->

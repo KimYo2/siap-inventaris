@@ -9,6 +9,7 @@ use App\Models\StockOpnameItem;
 use App\Models\StockOpnameSession;
 use App\Services\BmnParser;
 use App\Services\KondisiHistoryService;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -350,5 +351,61 @@ class StockOpnameController extends Controller
             'found' => $found,
             'missing' => max($total - $found, 0),
         ];
+    }
+
+    public function exportPdf($id)
+    {
+        $session = StockOpnameSession::query()
+            ->with('starter:id,nama')
+            ->findOrFail($id);
+
+        $items = StockOpnameItem::query()
+            ->where('session_id', $session->id)
+            ->leftJoin('barang as b', function ($join) {
+                $join->on('b.kode_barang', '=', 'stock_opname_items.kode_barang')
+                    ->on('b.nup', '=', 'stock_opname_items.nup');
+            })
+            ->leftJoin('users as u', 'u.id', '=', 'stock_opname_items.scanned_by')
+            ->select([
+                'stock_opname_items.kode_barang',
+                'stock_opname_items.nup',
+                'stock_opname_items.status',
+                'stock_opname_items.expected_kondisi',
+                'stock_opname_items.actual_kondisi',
+                'stock_opname_items.scanned_at',
+                'b.brand',
+                'b.tipe',
+                'u.nama as scanner_nama',
+            ])
+            ->orderByRaw("CASE WHEN stock_opname_items.status = 'found' THEN 0 ELSE 1 END")
+            ->orderBy('stock_opname_items.kode_barang')
+            ->orderBy('stock_opname_items.nup')
+            ->get();
+
+        $stats = $this->sessionStats($session->id);
+
+        $kondisiChanges = $items->filter(function ($item) {
+            return $item->status === StockOpnameItem::STATUS_FOUND
+                && $item->expected_kondisi
+                && $item->actual_kondisi
+                && $item->expected_kondisi !== $item->actual_kondisi;
+        })->count();
+
+        $generatedAt = Carbon::now('Asia/Jakarta');
+
+        $this->logAudit('export', 'stock_opname', $session->id, [
+            'format' => 'pdf',
+        ]);
+
+        $pdf = Pdf::loadView('admin.opname.pdf', compact(
+            'session', 'items', 'stats', 'kondisiChanges', 'generatedAt'
+        ))
+        ->setPaper('a4', 'portrait')
+        ->setOption('defaultFont', 'DejaVu Sans')
+        ->setOption('isHtml5ParserEnabled', true);
+
+        $filename = 'berita_acara_opname_' . $session->id . '_' . $generatedAt->format('Ymd_His') . '.pdf';
+
+        return $pdf->download($filename);
     }
 }
