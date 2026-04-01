@@ -2,6 +2,7 @@
 
 use App\Http\Middleware\EnsureAdmin;
 use Illuminate\Auth\Middleware\Authenticate;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 // Routes for New Features (Laravel 12 Standard)
@@ -101,10 +102,12 @@ Route::middleware(['web', Authenticate::class])->group(function () {
     });
 });
 
-// Fallback for Legacy Src
-// Auth Routes
+// Public Homepage
 Route::get('/', function () {
-    return redirect()->route('user.dashboard');
+    if (Auth::check()) {
+        return redirect()->route(Auth::user()->role === 'admin' ? 'admin.dashboard' : 'user.dashboard');
+    }
+    return view('home');
 });
 Route::get('/login', [App\Http\Controllers\Auth\LoginController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [App\Http\Controllers\Auth\LoginController::class, 'login']);
