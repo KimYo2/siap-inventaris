@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 
 class Barang extends Model
 {
@@ -15,6 +16,7 @@ class Barang extends Model
         'tipe',
         'kondisi_terakhir',
         'keterangan',
+        'foto_path',
         'nama_barang',
         'ketersediaan',
         'status_barang',
@@ -28,6 +30,14 @@ class Barang extends Model
         'waktu_pinjam',
         'waktu_kembali'
     ];
+
+    public function getFotoUrlAttribute(): string
+    {
+        if ($this->foto_path && Storage::disk('public')->exists($this->foto_path)) {
+            return Storage::url($this->foto_path);
+        }
+        return asset('images/no-image.svg');
+    }
 
     public function scopeFilter($query, array $filters): void
     {

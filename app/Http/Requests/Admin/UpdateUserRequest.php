@@ -22,6 +22,8 @@ class UpdateUserRequest extends FormRequest
             'email' => ['required', 'email', Rule::unique('users', 'email')->ignore($userId)],
             'password' => 'nullable|string|min:8|confirmed',
             'role' => 'required|in:admin,user',
+            'foto' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'hapus_foto' => 'nullable|boolean',
         ];
     }
 }

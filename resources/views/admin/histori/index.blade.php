@@ -130,7 +130,14 @@
                                 {{ $item->kode_barang }}-{{ $item->nup }}
                             </td>
                             <td class="px-4 py-3 whitespace-nowrap text-sm text-slate-700 dark:text-slate-300">
-                                {{ $item->nama_peminjam ?? '-' }}</td>
+                                <div class="flex items-center gap-2">
+                                    <img src="https://ui-avatars.com/api/?name={{ urlencode($item->nama_peminjam ?? 'User') }}&size=40&background=random&color=fff&bold=true&format=png"
+                                         alt="{{ $item->nama_peminjam ?? '-' }}"
+                                         class="w-7 h-7 rounded-full object-cover"
+                                         loading="lazy">
+                                    <span>{{ $item->nama_peminjam ?? '-' }}</span>
+                                </div>
+                            </td>
                             <td class="px-4 py-3 whitespace-nowrap text-sm text-slate-500 dark:text-slate-400 font-mono text-xs">
                                 {{ $item->nip_peminjam }}</td>
                             <td class="px-4 py-3 whitespace-nowrap text-sm text-slate-700 dark:text-slate-300">

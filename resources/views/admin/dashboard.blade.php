@@ -156,9 +156,15 @@
                 <div class="space-y-3">
                     @forelse($topBorrowers ?? [] as $item)
                         <div class="flex items-center justify-between text-sm">
-                            <div class="text-slate-700 dark:text-slate-300">
-                                <span class="font-medium">{{ $item->nama_peminjam ?? '-' }}</span>
-                                <span class="text-xs text-slate-500 dark:text-slate-400 ml-2">{{ $item->nip_peminjam }}</span>
+                            <div class="flex items-center gap-2 text-slate-700 dark:text-slate-300">
+                                <img src="https://ui-avatars.com/api/?name={{ urlencode($item->nama_peminjam ?? 'User') }}&size=40&background=random&color=fff&bold=true&format=png"
+                                     alt="{{ $item->nama_peminjam ?? '-' }}"
+                                     class="w-8 h-8 rounded-full object-cover"
+                                     loading="lazy">
+                                <div>
+                                    <span class="font-medium">{{ $item->nama_peminjam ?? '-' }}</span>
+                                    <span class="text-xs text-slate-500 dark:text-slate-400 ml-2">{{ $item->nip_peminjam }}</span>
+                                </div>
                             </div>
                             <span class="text-slate-900 dark:text-white font-semibold">{{ $item->total }}</span>
                         </div>

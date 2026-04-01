@@ -13,7 +13,7 @@
                 </p>
             </div>
 
-            <form action="{{ route('admin.barang.update', $barang->id) }}" method="POST" class="space-y-6">
+            <form action="{{ route('admin.barang.update', $barang->id) }}" method="POST" enctype="multipart/form-data" class="space-y-6">
                 @csrf
                 @method('PUT')
 
@@ -154,6 +154,42 @@
                         class="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-slate-900 dark:text-white transition"
                         placeholder="Catatan tambahan tentang barang (opsional)">{{ old('keterangan', $barang->keterangan) }}</textarea>
                     @error('keterangan')
+                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                {{-- Foto Barang --}}
+                <div>
+                    <label for="foto" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5 transition-colors">
+                        Foto Barang
+                        <span class="text-xs text-slate-400 ml-1">(opsional, maks. 2MB)</span>
+                    </label>
+                    @if($barang->foto_path)
+                    <div class="mb-2" id="foto-preview-wrapper">
+                        <img src="{{ $barang->foto_url }}"
+                             alt="Foto {{ $barang->brand }}"
+                             class="w-32 h-32 object-cover rounded-lg border border-slate-200 dark:border-slate-700"
+                             id="foto-preview">
+                        <label class="flex items-center gap-2 mt-1 text-sm text-red-500 cursor-pointer">
+                            <input type="checkbox" name="hapus_foto" value="1">
+                            Hapus foto ini
+                        </label>
+                    </div>
+                    @else
+                    <div class="mb-2 hidden" id="foto-preview-wrapper">
+                        <img src="" alt="Preview"
+                             class="w-32 h-32 object-cover rounded-lg border border-slate-200 dark:border-slate-700"
+                             id="foto-preview">
+                    </div>
+                    @endif
+                    <input type="file" name="foto" id="foto" accept="image/*"
+                           class="block w-full text-sm text-slate-500
+                                  file:mr-4 file:py-2 file:px-4 file:rounded-lg
+                                  file:border-0 file:text-sm file:font-medium
+                                  file:bg-blue-50 file:text-blue-700
+                                  hover:file:bg-blue-100
+                                  dark:file:bg-blue-900/30 dark:file:text-blue-300">
+                    @error('foto')
                         <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
                     @enderror
                 </div>
@@ -385,4 +421,17 @@
         {{-- ============================================================ --}}
 
     </div>
+
+    <script>
+    document.getElementById('foto').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function(ev) {
+            document.getElementById('foto-preview').src = ev.target.result;
+            document.getElementById('foto-preview-wrapper').classList.remove('hidden');
+        };
+        reader.readAsDataURL(file);
+    });
+    </script>
 @endsection

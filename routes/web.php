@@ -31,6 +31,10 @@ Route::middleware(['web', Authenticate::class])->group(function () {
     Route::post('/barang/{nomor_bmn}/waitlist', [App\Http\Controllers\User\WaitlistController::class, 'join'])->name('user.waitlist.join');
     Route::post('/waitlist/{id}/cancel', [App\Http\Controllers\User\WaitlistController::class, 'cancel'])->name('user.waitlist.cancel');
 
+    // User Profile
+    Route::get('/profile', [App\Http\Controllers\User\ProfileController::class, 'show'])->name('user.profile.show');
+    Route::post('/profile/foto', [App\Http\Controllers\User\ProfileController::class, 'update'])->name('user.profile.update');
+
     // Admin Only Routes
     Route::middleware([EnsureAdmin::class])->group(function () {
         // Admin Ticket Management

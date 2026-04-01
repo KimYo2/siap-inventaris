@@ -11,7 +11,7 @@
                 <p class="text-sm text-slate-500 dark:text-slate-400">Masukkan detail barang baru ke inventaris.</p>
             </div>
 
-            <form action="{{ route('admin.barang.store') }}" method="POST" class="space-y-6">
+            <form action="{{ route('admin.barang.store') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
                 @csrf
 
                 <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
@@ -154,6 +154,29 @@
                     @enderror
                 </div>
 
+                {{-- Foto Barang --}}
+                <div>
+                    <label for="foto" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5 transition-colors">
+                        Foto Barang
+                        <span class="text-xs text-slate-400 ml-1">(opsional, maks. 2MB)</span>
+                    </label>
+                    <div class="mb-2 hidden" id="foto-preview-wrapper">
+                        <img src="" alt="Preview"
+                             class="w-32 h-32 object-cover rounded-lg border border-slate-200 dark:border-slate-700"
+                             id="foto-preview">
+                    </div>
+                    <input type="file" name="foto" id="foto" accept="image/*"
+                           class="block w-full text-sm text-slate-500
+                                  file:mr-4 file:py-2 file:px-4 file:rounded-lg
+                                  file:border-0 file:text-sm file:font-medium
+                                  file:bg-blue-50 file:text-blue-700
+                                  hover:file:bg-blue-100
+                                  dark:file:bg-blue-900/30 dark:file:text-blue-300">
+                    @error('foto')
+                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                    @enderror
+                </div>
+
                 <div class="pt-4 flex items-center justify-end gap-3">
                     <a href="{{ route('admin.barang.index') }}"
                         class="px-5 py-2.5 text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-700 rounded-lg font-medium transition">Batal</a>
@@ -167,4 +190,17 @@
         </div>
 
     </div>
+
+    <script>
+    document.getElementById('foto').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function(ev) {
+            document.getElementById('foto-preview').src = ev.target.result;
+            document.getElementById('foto-preview-wrapper').classList.remove('hidden');
+        };
+        reader.readAsDataURL(file);
+    });
+    </script>
 @endsection

@@ -284,10 +284,10 @@
 
                         {{-- User Avatar --}}
                         <div class="flex items-center gap-2 text-slate-600 dark:text-slate-300">
-                            <div
-                                class="w-8 h-8 rounded-full bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 flex items-center justify-center text-sm font-semibold">
-                                {{ $initial }}
-                            </div>
+                            <img src="{{ auth()->user()->avatar_url }}"
+                                 alt="{{ $displayName }}"
+                                 class="w-8 h-8 rounded-full object-cover ring-2 ring-white dark:ring-slate-700"
+                                 loading="lazy">
                             <span class="hidden sm:block text-sm font-medium">{{ $label }}</span>
                         </div>
                     @endauth
@@ -415,15 +415,20 @@
                             class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors {{ request()->routeIs('return.*') ? 'bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700' }}">
                             <span class="text-lg">🔄</span> Kembalikan Barang
                         </a>
+                        <a href="{{ route('user.profile.show') }}"
+                            class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors {{ request()->routeIs('user.profile.*') ? 'bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700' }}">
+                            <span class="text-lg">👤</span> Profil Saya
+                        </a>
                     @endif
                 </div>
 
                 <!-- Drawer Footer: User Info -->
                 <div class="border-t border-slate-200 dark:border-slate-700 px-5 py-4">
                     <div class="flex items-center gap-3">
-                        <div class="w-9 h-9 rounded-full bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 flex items-center justify-center text-sm font-semibold">
-                            {{ $initial }}
-                        </div>
+                        <img src="{{ auth()->user()->avatar_url }}"
+                             alt="{{ $displayName }}"
+                             class="w-9 h-9 rounded-full object-cover ring-2 ring-slate-200 dark:ring-slate-700"
+                             loading="lazy">
                         <div class="flex-1 min-w-0">
                             <p class="text-sm font-medium text-slate-800 dark:text-white truncate">{{ $displayName }}</p>
                             <p class="text-xs text-slate-500 dark:text-slate-400">{{ $isAdmin ? 'Administrator' : 'User' }}</p>

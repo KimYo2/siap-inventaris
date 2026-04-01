@@ -16,6 +16,14 @@
                 </p>
             </div>
 
+            <!-- Foto Barang -->
+            <div class="p-6 pb-0">
+                <img src="{{ $barang->foto_url }}"
+                     alt="{{ $barang->brand }} {{ $barang->tipe }}"
+                     class="w-full max-w-xs h-48 object-cover rounded-xl border border-slate-200 dark:border-slate-700"
+                     loading="lazy">
+            </div>
+
             <!-- Details -->
             <div class="p-6 space-y-6">
 

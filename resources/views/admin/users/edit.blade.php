@@ -11,7 +11,19 @@
                 <p class="text-sm text-slate-500 dark:text-slate-400">{{ $user->name }} ({{ $user->nip }})</p>
             </div>
 
-            <form action="{{ route('admin.users.update', $user->id) }}" method="POST" class="space-y-6">
+            {{-- Avatar Section --}}
+            <div class="flex items-center gap-4 pb-4 border-b border-slate-200 dark:border-slate-700 mb-2">
+                <img src="{{ $user->avatar_url }}"
+                     alt="{{ $user->name }}"
+                     class="w-16 h-16 rounded-full object-cover ring-2 ring-slate-200 dark:ring-slate-700"
+                     id="avatar-preview">
+                <div class="flex-1">
+                    <p class="text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Foto Profil</p>
+                    <p class="text-xs text-slate-400 mb-2">JPG, PNG, atau WebP. Maks 2MB.</p>
+                </div>
+            </div>
+
+            <form action="{{ route('admin.users.update', $user->id) }}" method="POST" enctype="multipart/form-data" class="space-y-6">
                 @csrf
                 @method('PUT')
 
@@ -69,6 +81,30 @@
                     <p>Kosongkan password jika tidak ingin mengubahnya.</p>
                 </div>
 
+                {{-- Foto Profil Upload --}}
+                <div>
+                    <label for="avatar-foto" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5 transition-colors">
+                        Upload Foto Baru
+                        <span class="text-xs text-slate-400 ml-1">(opsional, maks. 2MB)</span>
+                    </label>
+                    @if($user->foto_path)
+                    <label class="flex items-center gap-2 mb-2 text-sm text-red-500 cursor-pointer">
+                        <input type="checkbox" name="hapus_foto" value="1">
+                        Hapus foto profil
+                    </label>
+                    @endif
+                    <input type="file" name="foto" id="avatar-foto" accept="image/*"
+                           class="block w-full text-sm text-slate-500
+                                  file:mr-4 file:py-2 file:px-4 file:rounded-lg
+                                  file:border-0 file:text-sm file:font-medium
+                                  file:bg-blue-50 file:text-blue-700
+                                  hover:file:bg-blue-100
+                                  dark:file:bg-blue-900/30 dark:file:text-blue-300">
+                    @error('foto')
+                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                    @enderror
+                </div>
+
                 <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
                     <div>
                         <label for="password"
@@ -104,4 +140,16 @@
         </div>
 
     </div>
+
+    <script>
+    document.getElementById('avatar-foto')?.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function(ev) {
+            document.getElementById('avatar-preview').src = ev.target.result;
+        };
+        reader.readAsDataURL(file);
+    });
+    </script>
 @endsection

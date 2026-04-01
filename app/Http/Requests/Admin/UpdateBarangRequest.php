@@ -22,6 +22,8 @@ class UpdateBarangRequest extends FormRequest
             'pic_user_id' => 'nullable|exists:users,id',
             'kategori_id' => 'nullable|exists:kategori,id',
             'ruangan_id' => 'nullable|exists:ruangan,id',
+            'foto' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'hapus_foto' => 'nullable|boolean',
         ];
     }
 }

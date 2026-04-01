@@ -24,7 +24,17 @@ class User extends Authenticatable
         'password',
         'role',
         'is_active',
+        'foto_path',
     ];
+
+    public function getAvatarUrlAttribute(): string
+    {
+        if ($this->foto_path && \Storage::disk('public')->exists($this->foto_path)) {
+            return \Storage::url($this->foto_path);
+        }
+        $name = urlencode($this->name ?? 'User');
+        return "https://ui-avatars.com/api/?name={$name}&size=128&background=random&color=fff&bold=true&format=png";
+    }
 
     /**
      * The attributes that should be hidden for serialization.

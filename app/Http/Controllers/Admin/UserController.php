@@ -9,6 +9,7 @@ use App\Http\Requests\Admin\UpdateUserRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class UserController extends Controller
 {
@@ -75,6 +76,18 @@ class UserController extends Controller
 
         if (!empty($data['password'])) {
             $updateData['password'] = $data['password'];
+        }
+
+        if ($request->hasFile('foto')) {
+            if ($user->foto_path) {
+                Storage::disk('public')->delete($user->foto_path);
+            }
+            $updateData['foto_path'] = $request->file('foto')->store('users/avatar', 'public');
+        }
+
+        if ($request->boolean('hapus_foto') && $user->foto_path) {
+            Storage::disk('public')->delete($user->foto_path);
+            $updateData['foto_path'] = null;
         }
 
         $user->update($updateData);

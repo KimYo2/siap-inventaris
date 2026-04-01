@@ -15,6 +15,7 @@ use App\Services\KondisiHistoryService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class BarangController extends Controller
 {
@@ -71,6 +72,9 @@ class BarangController extends Controller
             'tipe' => $data['tipe'],
             'kondisi_terakhir' => $data['kondisi'],
             'keterangan' => $data['keterangan'] ?? null,
+            'foto_path' => $request->hasFile('foto')
+                ? $request->file('foto')->store('barang/foto', 'public')
+                : null,
             'ketersediaan' => 'tersedia',
             'pic_user_id' => $data['pic_user_id'] ?? null,
             'kategori_id' => $data['kategori_id'] ?? null,
@@ -110,7 +114,7 @@ class BarangController extends Controller
         $barang = Barang::findOrFail($id);
         $data = $request->validated();
 
-        $barang->update([
+        $updateData = [
             'brand' => $data['brand'],
             'tipe' => $data['tipe'],
             'keterangan' => $data['keterangan'] ?? null,
@@ -118,7 +122,21 @@ class BarangController extends Controller
             'pic_user_id' => $data['pic_user_id'] ?? null,
             'kategori_id' => $data['kategori_id'] ?? null,
             'ruangan_id' => $data['ruangan_id'] ?? null,
-        ]);
+        ];
+
+        if ($request->hasFile('foto')) {
+            if ($barang->foto_path) {
+                Storage::disk('public')->delete($barang->foto_path);
+            }
+            $updateData['foto_path'] = $request->file('foto')->store('barang/foto', 'public');
+        }
+
+        if ($request->boolean('hapus_foto') && $barang->foto_path) {
+            Storage::disk('public')->delete($barang->foto_path);
+            $updateData['foto_path'] = null;
+        }
+
+        $barang->update($updateData);
 
         app(KondisiHistoryService::class)->record(
             $barang,
@@ -143,6 +161,11 @@ class BarangController extends Controller
     public function destroy($id)
     {
         $barang = Barang::findOrFail($id);
+
+        if ($barang->foto_path) {
+            Storage::disk('public')->delete($barang->foto_path);
+        }
+
         $barang->delete();
 
         $this->logAudit('delete', 'barang', $barang->id, [

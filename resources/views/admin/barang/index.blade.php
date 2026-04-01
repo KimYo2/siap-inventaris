@@ -124,6 +124,7 @@
                             <input type="checkbox" id="select-all"
                                 class="rounded border-slate-300 dark:border-slate-600 text-blue-600 focus:ring-blue-500">
                         </th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider whitespace-nowrap">Foto</th>
                         <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider whitespace-nowrap">Nomor BMN</th>
                         <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider whitespace-nowrap">Brand</th>
                         <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider whitespace-nowrap">Tipe</th>
@@ -144,6 +145,12 @@
                                         <td class="px-4 py-3 text-center w-10">
                                             <input type="checkbox" name="ids[]" value="{{ $item->id }}" form="bulk-qr-form"
                                                 class="bulk-checkbox rounded border-slate-300 dark:border-slate-600 text-blue-600 focus:ring-blue-500">
+                                        </td>
+                                        <td class="px-4 py-3 whitespace-nowrap">
+                                            <img src="{{ $item->foto_url }}"
+                                                 alt="{{ $item->brand }}"
+                                                 class="w-10 h-10 object-cover rounded-md"
+                                                 loading="lazy">
                                         </td>
                                         <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-slate-900 dark:text-white">
                                             {{ $item->kode_barang }}-{{ $item->nup }}
@@ -343,7 +350,7 @@
                                         </tr>
                         @empty
                             <tr>
-                                <td colspan="11">
+                                <td colspan="12">
                                     <x-empty-state
                                         icon="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"
                                         title="Belum ada data barang"
