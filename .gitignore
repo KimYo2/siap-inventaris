@@ -26,7 +26,9 @@ Homestead.yaml
 Thumbs.db
 database/_backup/
 *.sql
+migration_log.txt
 
 # Google Cloud Credentials (sensitive)
 /storage/credentials.json
 credentials.json
+migration_log.txt
