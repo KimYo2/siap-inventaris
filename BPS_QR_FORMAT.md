@@ -2,16 +2,22 @@
 
 ## 📋 Format QR Code Asli BPS
 
-### Contoh QR Code BPS
-
-![QR Code BPS](file:///C:/Users/KimY/.gemini/antigravity/brain/c9cae4e5-f507-4b46-becc-75bab012f030/uploaded_media_0_1769414497187.jpg)
-
 ### Isi QR Code
 
-![QR Code Content](file:///C:/Users/KimY/.gemini/antigravity/brain/c9cae4e5-f507-4b46-becc-75bab012f030/uploaded_media_1_1769414497187.jpg)
+QR Code yang tertempel pada barang inventaris BPS berisi teks berikut:
 
 ```
 INV-20210420145333129398000*054010300C*190000000KD*3100102001*37
+```
+
+Contoh representasi visual isi QR (teks):
+
+```
++----------------------------------------------------------+
+|  INV-20210420145333129398000*054010300C*190000000KD*     |
+|  3100102001*37                                           |
++----------------------------------------------------------+
+  ↑ Teks di atas adalah isi decoded QR Code dari stiker BPS
 ```
 
 ## 🔍 Struktur Data
@@ -19,44 +25,60 @@ INV-20210420145333129398000*054010300C*190000000KD*3100102001*37
 QR Code BPS menggunakan **delimiter asterisk (`*`)** untuk memisahkan data:
 
 ```
-INV-[timestamp]*[kode1]*[kode2]*[NOMOR_BMN]*[nomor_urut]
+INV-[timestamp]*[kode_unit]*[kode_kategori]*[NOMOR_BMN]*[NUP]
 ```
 
-### Breakdown:
+### Breakdown (Index 0-based setelah split `*`):
 
-| Segment | Contoh | Keterangan |
-|---------|--------|------------|
-| 1 | `INV-20210420145333129398000` | Prefix + Timestamp |
-| 2 | `054010300C` | Kode lokasi/unit |
-| 3 | `190000000KD` | Kode kategori |
-| **4** | **`3100102001`** | **NOMOR BMN** ⭐ |
-| 5 | `37` | Nomor urut |
+| Index | Contoh | Keterangan |
+|-------|--------|------------|
+| `[0]` | `INV-20210420145333129398000` | Prefix + Timestamp |
+| `[1]` | `054010300C` | Kode lokasi/unit |
+| `[2]` | `190000000KD` | Kode kategori |
+| **`[3]`** | **`3100102001`** | **Kode Barang (Nomor BMN)** ⭐ |
+| **`[4]`** | **`37`** | **NUP (Nomor Urut Pendaftaran)** ⭐ |
 
-## ✅ Parser Implementation (New Logic)
+> **Catatan penting**: Setelah `split('*')`, indeks dimulai dari `0`.
+> Kode Barang ada di `parts[3]`, bukan `parts[2]`.
+> NUP ada di `parts[4]`, bukan `parts[3]`.
+
+## ✅ Parser Implementation
 
 ### JavaScript Parser
 
 ```javascript
-// Parse BPS QR Code if detected (Format: INV-...*...*CODE*NUP)
+// Parse BPS QR Code if detected (Format: INV-...*UNIT*KATEGORI*KODE*NUP)
 if (decodedText.includes('*')) {
     const parts = decodedText.split('*');
-    // Usually parts[2] is Code, parts[3] is NUP
-    if (parts.length >= 4) {
-        this.scannedCode = parts[2].trim() + '-' + parts[3].trim();
+    if (parts.length >= 5) {
+        // Full BPS format: INV*UNIT*KATEGORI*KODE*NUP
+        this.scannedCode = parts[3].trim() + '-' + parts[4].trim();
+        this.isRawBPS = true;
+    } else if (parts.length >= 3) {
+        // Shorter fallback (e.g. BPS*KATEGORI*KODE*NUP)
+        this.scannedCode = parts[2].trim();
         this.isRawBPS = true;
     } else {
-        this.scannedCode = decodedText; // Fallback
+        this.scannedCode = decodedText; // Fallback langsung
     }
 }
 ```
 
 ### Contoh Parsing
 
-**Input:**
+**Input (format lengkap BPS):**
 ```
-INV-20210420...*054010300C*3100102001*37
+INV-20210420145333129398000*054010300C*190000000KD*3100102001*37
 ```
-*(Refleksi struktur baru: Index 2 = Kode Barang, Index 3 = NUP)*
+
+**Proses:**
+```
+parts[0] = "INV-20210420145333129398000"  → timestamp, diabaikan
+parts[1] = "054010300C"                   → kode unit, diabaikan
+parts[2] = "190000000KD"                  → kode kategori, diabaikan
+parts[3] = "3100102001"                   → ✅ Kode Barang
+parts[4] = "37"                           → ✅ NUP
+```
 
 **Output:**
 ```
@@ -68,28 +90,61 @@ INV-20210420...*054010300C*3100102001*37
 ### Flow Lengkap
 
 ```
-1. Scan QR Code BPS
+1. Scan QR Code BPS (stiker fisik pada barang)
    ↓
-2. Decode QR → "INV...*UNIT*3100102001*37"
+2. Decode QR → "INV...*054010300C*190000000KD*3100102001*37"
    ↓
-3. Cek delimiter asterisk ('*')
+3. Cek apakah string mengandung delimiter '*'
    ↓
-4. Split string dengan '*'
+4. Split string dengan '*' → array 5 elemen
    ↓
-5. Ambil Part[2] (Kode Barang) dan Part[3] (NUP)
+5. Ambil parts[3] (Kode Barang) dan parts[4] (NUP)
    ↓
 6. Gabungkan dengan hyphen: "3100102001-37"
    ↓
-7. Query database untuk pencarian spesifik (Kode + NUP)
+7. Query database: WHERE kode_barang = '3100102001' AND nup = '37'
 ```
 
-### Logic Baru
+### Logika Parsing
 
-- **Format Target**: `[KodeBarang]-[NUP]`
-- **Sumber Data**: 
-    - `parts[2]` → Kode Barang (10 digit, e.g. 310xxxxxxxx)
-    - `parts[3]` → NUP (Nomor Urut Pendaftaran, 1-3 digit)
-- **Tujuan**: Memungkinkan identifikasi barang yang lebih spesifik karena kombinasi Kode+NUP adalah unique key yang sebenarnya.
+- **Format Target**: `[kode_barang]-[NUP]`
+- **Sumber Data**:
+    - `parts[3]` → Kode Barang (e.g. `3100102001`)
+    - `parts[4]` → NUP (Nomor Urut Pendaftaran, e.g. `37`)
+- **Tujuan**: Kombinasi `kode_barang + NUP` adalah *composite key* unik yang mengidentifikasi satu unit barang secara spesifik.
+
+## 🏷️ Format QR Code Sistem Ini (Generated)
+
+Selain membaca QR Code dari stiker BPS lama, sistem ini juga **meng-generate QR Code sendiri** yang dapat dicetak sebagai label barang baru melalui panel admin.
+
+### Format QR yang Di-generate Sistem
+
+```
+[kode_barang]-[NUP]
+```
+
+**Contoh:**
+```
+3100102001-37
+```
+
+QR Code ini berisi **plain text** dalam format `kode_barang-NUP`, tanpa segmen tambahan.
+
+### Cara Generate
+
+1. Masuk ke panel admin → halaman **Daftar Barang**
+2. Klik ikon QR pada baris barang yang diinginkan
+3. Sistem menampilkan halaman cetak label QR
+4. Gunakan fungsi print browser untuk mencetak
+
+### Perbedaan dengan QR BPS Lama
+
+| Aspek | QR BPS Lama (Stiker) | QR Sistem Ini |
+|-------|----------------------|---------------|
+| Format | `INV-...*...*...*KODE*NUP` | `KODE-NUP` |
+| Segmen | 5 bagian dipisah `*` | 1 string langsung |
+| Parsing | `parts[3]` + `parts[4]` | Langsung digunakan |
+| Asal | Dicetak BPS pusat | Di-generate dari admin |
 
 ## 🧪 Testing
 
@@ -100,73 +155,83 @@ INV-20210420...*054010300C*3100102001*37
 INV-20210420145333129398000*054010300C*190000000KD*3100102001*37
 ```
 
-**Expected:**
+**Proses:** `parts.length = 5` → ambil `parts[3]` dan `parts[4]`
+
+**Expected output:**
 ```
-3100102001 ✅
+3100102001-37 ✅
 ```
 
-### Test Case 2: Plain BMN
+### Test Case 2: Plain BMN (QR sistem ini atau manual)
 
 **Input:**
 ```
-3100102001
+3100102001-37
 ```
 
-**Expected:**
+**Proses:** Tidak ada `*` → digunakan langsung
+
+**Expected output:**
 ```
-3100102001 ✅
+3100102001-37 ✅
 ```
 
-### Test Case 3: Format Berbeda
+### Test Case 3: Format Fallback (4 segmen)
 
 **Input:**
 ```
 BPS*LAPTOP*3100102002*2021
 ```
 
-**Expected:**
+**Proses:** `parts.length = 4` → masuk blok `>= 3`, ambil `parts[2]`
+
+**Expected output:**
 ```
-3100102002 ✅ (fallback pattern)
+3100102002 ✅ (fallback — NUP tidak diambil karena format tidak standar)
 ```
+
+> **Catatan**: Jika `parts[3]` berisi angka (NUP), sistem pencarian akan mencoba mencocokkan dengan kode saja. Untuk hasil terbaik, gunakan QR format lengkap.
 
 ## 🔧 Troubleshooting
 
 ### QR Tidak Terbaca
 
 **Penyebab:**
-- QR Code rusak/blur
-- Pencahayaan kurang
-- Jarak terlalu dekat/jauh
+- QR Code rusak/blur atau terlipat
+- Pencahayaan kurang memadai
+- Jarak kamera terlalu dekat/jauh
 
 **Solusi:**
-- Pastikan QR Code jelas
-- Tambah cahaya
-- Adjust jarak 10-30cm
+- Pastikan QR Code dalam kondisi bersih dan jelas
+- Tambah pencahayaan dari arah samping
+- Jaga jarak kamera sekitar 10–30 cm
 
-### Barang Tidak Ditemukan
+### Barang Tidak Ditemukan Setelah Scan
 
 **Penyebab:**
-- Nomor BMN tidak ada di database
-- Format parsing salah
+- Nomor BMN atau NUP tidak sesuai dengan database
+- Format parsing menghasilkan nilai yang salah
 
-**Solusi:**
-1. Cek console browser (F12)
-2. Lihat log: "Extracted BMN: xxx"
-3. Pastikan nomor BMN ada di database
-4. Cek tabel `barang` di MySQL
+**Langkah Debug:**
+1. Buka console browser (F12 → Console)
+2. Cari log: `"Extracted BMN: xxx"`
+3. Pastikan nilai yang ter-extract sesuai dengan data di tabel `barang`
+4. Cek kombinasi `kode_barang` + `nup` di MySQL
 
 ## 📊 Database Matching
 
 ### Query yang Dijalankan
 
 ```sql
+-- Pencarian berdasarkan kode_barang dan nup (composite key)
 SELECT * FROM barang 
-WHERE nomor_bmn = '3100102001'
+WHERE kode_barang = '3100102001' 
+  AND nup = 37
 ```
 
-### Jika Tidak Ketemu
+### Jika Tidak Ditemukan
 
-Sistem akan return error:
+Sistem akan mengembalikan respons:
 ```json
 {
   "success": false,
@@ -174,24 +239,22 @@ Sistem akan return error:
 }
 ```
 
-### Solusi
+### Query Debugging
 
-Pastikan nomor BMN ada di database:
 ```sql
--- Cek apakah BMN ada
-SELECT * FROM barang WHERE nomor_bmn LIKE '3100102001%';
+-- Cek apakah kode_barang ada
+SELECT kode_barang, nup, brand, tipe 
+FROM barang 
+WHERE kode_barang LIKE '31001020%';
 
--- Atau cek semua BMN yang mirip
-SELECT nomor_bmn, brand, tipe FROM barang 
-WHERE nomor_bmn LIKE '31001020%';
+-- Cek kombinasi spesifik
+SELECT * FROM barang 
+WHERE kode_barang = '3100102001' AND nup = 37;
 ```
 
-## ✨ Update Terbaru
+## Changelog
 
-- ✅ Parser BPS QR format dengan delimiter `*`
-- ✅ Extract BMN dari segment ke-4
-- ✅ Fallback pattern matching untuk format berbeda
-- ✅ Logging untuk debugging
-- ✅ Error message yang informatif
-
-Sistem sekarang sudah bisa handle QR Code BPS yang asli!
+- **v1.0** — Implementasi awal parser QR Code BPS dengan delimiter `*`
+- **v1.1** — Perbaikan indeks segmen: `parts[3]` = kode_barang, `parts[4]` = NUP
+- **v1.2** — Tambah fallback untuk format QR non-standar (< 5 segmen)
+- **v1.3** — Tambah dokumentasi format QR yang di-generate sistem

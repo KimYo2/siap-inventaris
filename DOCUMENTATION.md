@@ -1,403 +1,395 @@
 # Dokumentasi Sistem Peminjaman BMN
 
-> **Dokumentasi Lengkap**: Implementasi BPS Color Scheme, Dark Mode, dan Custom Light Mode Theme
+> Sistem manajemen inventaris dan peminjaman barang milik negara (BMN) berbasis web, dibangun dengan Laravel 12 untuk BPS (Badan Pusat Statistik).
 
 ---
 
 ## 📋 Daftar Isi
 
-1. [Overview](#overview)
-2. [BPS Color Scheme](#bps-color-scheme)
-3. [Dark Mode Implementation](#dark-mode-implementation)
-4. [Custom Light Mode Theme](#custom-light-mode-theme)
-5. [Technical Implementation](#technical-implementation)
-6. [Issues Fixed](#issues-fixed)
-7. [Files Modified](#files-modified)
-8. [Verification](#verification)
+1. [Overview](#1-overview)
+2. [Fitur Utama](#2-fitur-utama)
+3. [Struktur Folder Penting](#3-struktur-folder-penting)
+4. [Instalasi & Setup](#4-instalasi--setup)
+5. [Akses dari HP / Jaringan Lokal](#5-akses-dari-hp--jaringan-lokal)
+6. [BPS Color Scheme](#6-bps-color-scheme)
+7. [Dark Mode](#7-dark-mode)
+8. [Default Login Credentials](#8-default-login-credentials)
+9. [Changelog / Riwayat Update](#9-changelog--riwayat-update)
 
 ---
 
-## Overview
+## 1. Overview
 
-Proyek ini telah diupdate dengan implementasi lengkap:
-- ✅ BPS Color Scheme (Official Government Branding)
-- ✅ Dark Mode Support di semua halaman
-- ✅ Custom Light Mode dengan background #cfcfcf
-- ✅ Harmonisasi warna untuk konsistensi visual
+**Sistem Peminjaman BMN** adalah aplikasi web manajemen peminjaman Barang Milik Negara (BMN) yang dirancang khusus untuk lingkungan BPS (Badan Pusat Statistik).
+
+| Atribut | Detail |
+|---------|--------|
+| **Nama Proyek** | Sistem Peminjaman BMN |
+| **Dibangun untuk** | BPS — Badan Pusat Statistik |
+| **Tujuan** | Manajemen inventaris & peminjaman barang via QR Code |
+| **Framework** | Laravel 12 |
+| **Bahasa** | PHP 8.2+ |
+| **Database** | MySQL |
+| **Frontend** | Blade + Tailwind CSS (CDN) + Alpine.js |
+| **Build Tool** | Vite |
+| **Repository** | https://github.com/KimYo2/Sistem-Peminjaman-BMN |
+
+### Dua Role Pengguna
+
+- **Admin** — mengelola inventaris, menyetujui peminjaman, melihat laporan
+- **User (Pegawai)** — melakukan pengajuan peminjaman via scan QR Code
 
 ---
 
-## BPS Color Scheme
+## 2. Fitur Utama
+
+### Manajemen Barang
+- CRUD barang inventaris (kode BMN, NUP, brand, tipe, kondisi)
+- Import massal dari file CSV
+- Upload foto barang (opsional, disimpan di Laravel storage)
+- Filter inventaris: ketersediaan, kategori, ruangan, status barang
+- Cetak label QR Code per barang atau batch (bulk)
+- Status barang: Aktif, Rusak Total, Hilang, Dihapuskan
+
+### Kategori & Ruangan
+- CRUD kategori barang
+- CRUD ruangan/lokasi penyimpanan
+
+### Peminjaman
+- Pengajuan peminjaman oleh user via scan QR Code
+- Alur status: `menunggu` → `disetujui` → `aktif` → `dikembalikan`
+- Persetujuan/penolakan oleh admin
+- Perpanjangan masa peminjaman (dengan approval admin)
+- Jatuh tempo & notifikasi overdue
+
+### Waitlist / Antrian
+- Waitlist otomatis jika barang sedang dipinjam
+- Notifikasi ke user berikutnya saat barang dikembalikan
+
+### Pengembalian
+- Scan QR untuk pengembalian
+- Laporan kondisi barang saat kembali
+- Pembuatan tiket kerusakan otomatis jika kondisi buruk
+
+### Stock Opname
+- Sesi stock opname dengan scan QR per barang
+- Rekap hasil opname
+- Export laporan ke CSV dan PDF
+
+### Tiket Kerusakan
+- Pembuatan tiket manual atau otomatis dari pengembalian
+- Status tiket: open, in_progress, resolved
+- Prioritas: low, medium, high, critical
+- Assign ke admin tertentu
+- Log aktivitas tiket
+
+### Dashboard Admin
+- Ringkasan statistik: total barang, peminjaman aktif, overdue, tiket terbuka
+- Daftar Top Peminjam
+- Grafik tren peminjaman 6 bulan
+- Daftar peminjaman terbaru dan overdue
+
+### Audit Log
+- Setiap aksi admin (create, update, delete, approve, dsb.) tercatat otomatis
+- Metadata: user, action, resource, detail, timestamp
+
+### Dark Mode
+- Toggle di navbar, persisten via `localStorage`
+- Diterapkan ke seluruh halaman dengan `darkMode: 'class'` Tailwind
+
+### QR Code Scan
+- Scan via kamera menggunakan `html5-qrcode`
+- Mendukung format QR BPS lama (format `INV-...*...*...*KODE*NUP`)
+- Mendukung format QR yang di-generate sistem ini (`KODE-NUP`)
+
+### Avatar User
+- Foto profil opsional (upload ke Laravel storage)
+- Fallback otomatis ke [UI Avatars](https://ui-avatars.com/) berdasarkan inisial nama
+- User dapat upload/hapus foto dari halaman profil
+- Admin dapat update avatar user dari panel manajemen user
+
+---
+
+## 3. Struktur Folder Penting
+
+```
+app/
+├── Http/
+│   ├── Controllers/
+│   │   ├── Admin/          → BarangController, UserController, HistoriController,
+│   │   │                     DashboardController, TiketKerusakanController,
+│   │   │                     StockOpnameController, QrLabelController, dll.
+│   │   ├── User/           → BarangController, HistoriController, ScanController,
+│   │   │                     ProfileController, WaitlistController, dll.
+│   │   ├── Auth/           → LoginController
+│   │   └── Concerns/       → LogsAudit (trait)
+│   ├── Middleware/
+│   │   └── EnsureAdmin.php → Proteksi route admin
+│   └── Requests/
+│       └── Admin/          → Form Request validation
+├── Models/
+│   ├── Barang.php
+│   ├── User.php
+│   ├── HistoriPeminjaman.php
+│   ├── Kategori.php
+│   ├── Ruangan.php
+│   ├── TiketKerusakan.php
+│   ├── StockOpnameSession.php
+│   ├── Waitlist.php
+│   ├── Notifikasi.php
+│   └── AuditLog.php
+└── Services/
+    ├── BmnParser.php           → Parser nomor BMN dari QR
+    ├── BarangImportService.php → Import CSV barang
+    └── KondisiHistoryService.php
+
+resources/views/
+├── layouts/
+│   └── app.blade.php       → Layout utama (navbar, dark mode, notifikasi)
+├── components/             → Komponen Blade (responsive-table, empty-state, dll.)
+├── admin/
+│   ├── barang/             → index, create, edit
+│   ├── users/              → index, create, edit
+│   ├── histori/            → index, pdf
+│   ├── dashboard.blade.php
+│   ├── opname/
+│   └── tiket/
+└── user/
+    ├── barang/             → show
+    ├── histori/            → index
+    ├── profile/            → show
+    └── dashboard.blade.php
+
+database/
+├── migrations/             → Semua file migrasi tabel
+└── seeders/
+    ├── UserSeeder.php
+    └── DatabaseSeeder.php
+```
+
+---
+
+## 4. Instalasi & Setup
+
+### Prasyarat
+
+- PHP 8.2 atau lebih baru
+- Composer
+- Node.js & npm
+- MySQL 8.0+
+
+### Langkah Instalasi
+
+```bash
+# 1. Clone repository
+git clone https://github.com/KimYo2/Sistem-Peminjaman-BMN.git
+cd Sistem-Peminjaman-BMN
+
+# 2. Install dependensi PHP
+composer install
+
+# 3. Install dependensi JavaScript
+npm install
+
+# 4. Salin file environment
+cp .env.example .env
+
+# 5. Generate app key
+php artisan key:generate
+```
+
+### Konfigurasi Database
+
+Edit file `.env`, sesuaikan bagian berikut:
+
+```env
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=sistem_peminjaman_bmn
+DB_USERNAME=root
+DB_PASSWORD=
+```
+
+### Selesaikan Setup
+
+```bash
+# 6. Jalankan migrasi dan seed data awal
+php artisan migrate --seed
+
+# 7. Buat symlink untuk storage (foto barang & avatar)
+php artisan storage:link
+
+# 8. Build aset frontend
+npm run build
+
+# 9. Jalankan server lokal
+php artisan serve
+```
+
+Aplikasi dapat diakses di: `http://localhost:8000`
+
+---
+
+## 5. Akses dari HP / Jaringan Lokal
+
+Untuk mengakses aplikasi dari perangkat lain dalam jaringan yang sama (misalnya HP untuk scan QR):
+
+### 1. Jalankan server dengan host terbuka
+
+```bash
+php artisan serve --host=0.0.0.0 --port=8000
+```
+
+### 2. Cari IP laptop/PC
+
+**Windows:**
+```
+ipconfig
+```
+Cari baris **IPv4 Address** (contoh: `192.168.1.5`)
+
+**macOS/Linux:**
+```
+ifconfig
+```
+
+### 3. Akses dari HP
+
+Buka browser di HP, ketik:
+```
+http://192.168.1.5:8000
+```
+(ganti dengan IP laptop Anda)
+
+### Catatan Firewall
+
+Windows Firewall mungkin memblokir koneksi masuk ke port 8000.
+Jika HP tidak bisa terhubung:
+
+1. Buka **Windows Defender Firewall** → *Advanced Settings*
+2. Pilih **Inbound Rules** → **New Rule**
+3. Pilih **Port** → TCP → Port `8000`
+4. Pilih **Allow the connection**
+5. Simpan aturan
+
+Atau gunakan perintah PowerShell (run as Administrator):
+```powershell
+netsh advfirewall firewall add rule name="Laravel Dev" dir=in action=allow protocol=TCP localport=8000
+```
+
+---
+
+## 6. BPS Color Scheme
+
+Sistem menggunakan palet warna yang mengikuti panduan visual BPS (Badan Pusat Statistik).
 
 ### Color Palette
 
 #### 🟦 Primary (Blue)
-- **Main Blue**: `#2563EB` (Tailwind: `blue-600`)
-- **Usage**: Headers, navbar, primary buttons, icons
+- **Warna utama**: `#2563EB` (Tailwind: `blue-600`)
+- **Digunakan untuk**: Navbar, tombol utama, ikon header
 - **Dark Mode**: `#3B82F6` (Tailwind: `blue-500`)
 
-#### 🟧 Accent (Orange - Use Sparingly!)
-- **Orange**: `#F59E0B` (Tailwind: `amber-500`)
-- **Usage**: "Dipinjam" status badges, active indicators
-- ⚠️ **NOT for**: Main backgrounds, headers, primary buttons
+#### 🟧 Accent (Orange — Digunakan Secukupnya)
+- **Warna aksen**: `#F59E0B` (Tailwind: `amber-500`)
+- **Digunakan untuk**: Badge status "Dipinjam", indikator aktif
+- ⚠️ **Jangan digunakan untuk**: Latar belakang utama, header, tombol primary
 
-#### 🟢🟥🟡 Status Colors
-- **Tersedia (Available)**: `#16A34A` - Green (`green-600`)
-- **Dipinjam (Borrowed)**: `#DC2626` - Red (`red-600`)
-- **Selesai (Completed)**: `#16A34A` - Green (`green-600`)
-- **Menunggu (Pending)**: `#EAB308` - Yellow (`yellow-500`)
+#### Status Colors
 
-### Pages Updated with BPS Colors
-
-1. **login.php** - Logo container, login button
-2. **admin/dashboard.php** - Header icon, stat cards, quick actions
-3. **admin/daftar_barang.php** - "Tambah Barang" button
-4. **admin/edit_barang.php** - "Simpan Perubahan" button
-5. **admin/histori.php** - Filters, status badges
-6. **admin/scan_return.php** - Loading spinner, messages
-7. **user/dashboard.php** - Scan QR card, history badges
-8. **user/scan.php** - Existing blue buttons maintained
+| Status | Warna | Kode | Tailwind |
+|--------|-------|------|----------|
+| Tersedia | Hijau | `#16A34A` | `green-600` |
+| Dipinjam | Merah | `#DC2626` | `red-600` |
+| Menunggu | Kuning | `#EAB308` | `yellow-500` |
+| Selesai | Hijau | `#16A34A` | `green-600` |
+| Overdue | Merah tua | `#B91C1C` | `red-700` |
 
 ---
 
-## Dark Mode Implementation
+## 7. Dark Mode
 
-### Features
-- ✅ Dark mode toggle button on all pages
-- ✅ Persistent theme preference (localStorage)
-- ✅ Smooth transitions between light/dark modes
-- ✅ Proper color contrast for accessibility
+### Cara Kerja
 
-### Dark Mode Colors
+- Tombol toggle (ikon matahari/bulan) tersedia di pojok kanan navbar
+- Pilihan tema tersimpan di `localStorage` dan persisten antar sesi
+- Mode gelap diterapkan dengan menambahkan class `dark` pada elemen `<html>`
 
-| Element | Color | Tailwind Class |
-|---------|-------|----------------|
-| Background | #0f172a | `slate-900` |
-| Cards | #1e293b | `slate-800` |
-| Headers | #1e293b | `slate-800` |
-| Borders | #334155 | `slate-700` |
-| Text | #f1f5f9 | `slate-100` |
-
-### Pages with Dark Mode
-
-- ✅ Login page
-- ✅ Admin Dashboard
-- ✅ User Dashboard
-- ✅ Scan pages (user & admin)
-- ✅ Daftar Barang
-- ✅ Edit Barang
-- ✅ Tambah Barang
-- ✅ Histori
-- ✅ Scan Return
-
-### Dark Mode Toggle Implementation
+### Konfigurasi Tailwind
 
 ```javascript
-// main.js
-function toggleDarkMode() {
-    if (document.documentElement.classList.contains('dark')) {
-        document.documentElement.classList.remove('dark');
-        localStorage.theme = 'light';
-        updateToggleIcon('light');
-    } else {
-        document.documentElement.classList.add('dark');
-        localStorage.theme = 'dark';
-        updateToggleIcon('dark');
-    }
-}
-
-function initDarkMode() {
-    if (localStorage.theme === 'dark' || 
-        (!('theme' in localStorage) && 
-         window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-        document.documentElement.classList.add('dark');
-        updateToggleIcon('dark');
-    } else {
-        document.documentElement.classList.remove('dark');
-        updateToggleIcon('light');
-    }
-}
+// Di dalam <script> di layout utama
+window.tailwind.config = {
+    darkMode: 'class'
+};
 ```
 
----
+### Kelas Dark Mode di Blade
 
-## Custom Light Mode Theme
-
-### Challenge
-User requested custom background color `#cfcfcf` for light mode with harmonized element colors to create a softer, more cohesive aesthetic.
-
-### Solution: CSS Override File
-
-Created `public/src/assets/css/light-mode-override.css` with strategic color overrides that only apply in light mode.
-
-### Light Mode Color Palette
-
-| Element | Color | Description |
-|---------|-------|-------------|
-| Body Background | #cfcfcf | Custom gray (medium) |
-| Headers/Navbar | #f5f5f5 | Very light gray |
-| Cards/Containers | #e8e8e8 | Soft gray |
-| Form Inputs | #f0f0f0 | Lighter gray |
-| Table Headers | #e0e0e0 | Medium gray |
-
-### CSS Implementation
-
-```css
-/* Light Mode Color Overrides for #cfcfcf Background Theme */
-/* CRITICAL: Only apply these styles in LIGHT MODE (html:not(.dark)) */
-
-/* Body Background - Custom Gray */
-html:not(.dark) body {
-    background-color: #cfcfcf !important;
-}
-
-/* Headers/Navbar - Light Gray */
-html:not(.dark) header {
-    background-color: #f5f5f5 !important;
-}
-
-/* Cards and Containers - Soft Gray */
-html:not(.dark) .bg-white {
-    background-color: #e8e8e8 !important;
-}
-
-/* Form Inputs - Slightly Lighter */
-html:not(.dark) input[type="text"],
-html:not(.dark) input[type="password"],
-html:not(.dark) input[type="number"],
-html:not(.dark) input[type="email"],
-html:not(.dark) select,
-html:not(.dark) textarea {
-    background-color: #f0f0f0 !important;
-}
-
-/* Table headers */
-html:not(.dark) thead {
-    background-color: #e0e0e0 !important;
-}
-```
-
-### Key Technical Decisions
-
-1. **CSS Override File**: Created separate CSS file (`light-mode-override.css`) for maintainability
-2. **Selector Strategy**: Used `html:not(.dark)` to target ONLY light mode
-3. **No Inline Styles**: Removed ALL inline `style` attributes to prevent conflicts
-4. **Dark Mode Class**: Leveraged Tailwind's `darkMode: 'class'` on `<html>` element
-5. **Important Flag**: Used `!important` only for light mode overrides to ensure they apply
-
----
-
-## Technical Implementation
-
-### Tailwind Configuration
-
-All pages include this Tailwind config:
-
-```javascript
-tailwind.config = {
-    darkMode: 'class',
-    theme: {
-        extend: {
-            colors: {
-                slate: {
-                    50: '#f8fafc',
-                    100: '#f1f5f9',
-                    200: '#e2e8f0',
-                    300: '#cbd5e1',
-                    400: '#94a3b8',
-                    500: '#64748b',
-                    600: '#475569',
-                    700: '#334155',
-                    800: '#1e293b',
-                    900: '#0f172a',
-                }
-            }
-        }
-    }
-}
-```
-
-### HTML Structure
+Seluruh elemen menggunakan pola `dark:` prefix Tailwind secara konsisten:
 
 ```html
-<head>
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Light Mode Override CSS -->
-    <link rel="stylesheet" href="/src/assets/css/light-mode-override.css">
-    
-    <!-- Tailwind Config -->
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            // ... config
-        }
-    </script>
-</head>
-
-<body class="dark:bg-slate-900 min-h-screen transition-colors duration-200">
-    <!-- Dark Mode Toggle Button -->
-    <button onclick="toggleDarkMode()" class="...">
-        <svg id="darkModeIcon">...</svg>
-    </button>
-    
-    <!-- Page Content -->
-</body>
+<div class="bg-white dark:bg-slate-800 text-slate-900 dark:text-white">
+    ...
+</div>
 ```
 
----
+### File Pendukung
 
-## Issues Fixed
-
-### Issue 1: Dark Mode Not Working
-**Problem**: Light mode colors appearing in dark mode  
-**Root Cause**: CSS used `body:not(.dark)` but dark class was on `<html>` element  
-**Solution**: Changed all selectors to `html:not(.dark)`
-
-### Issue 2: Inline Styles Conflicting
-**Problem**: Inline `style="background-color: #cfcfcf"` overriding dark mode  
-**Root Cause**: Inline styles have higher specificity than CSS classes  
-**Solution**: Removed ALL inline styles from all pages, let CSS handle everything
-
-### Issue 3: Cards Still Light in Dark Mode
-**Problem**: Cards showing #e8e8e8 in dark mode  
-**Root Cause**: CSS `!important` overriding Tailwind dark mode classes  
-**Solution**: Only apply overrides with `html:not(.dark)` selector
-
-### Issue 4: Header Background Conflicts
-**Problem**: Headers still showing light colors in dark mode  
-**Root Cause**: Inline styles and scripts trying to manipulate background  
-**Solution**: Removed inline styles and scripts, added `bg-white` class for CSS override
+- `public/js/theme.js` — Inisialisasi tema saat halaman dimuat (sebelum render)
+- Dipasang di `<head>` sebelum Tailwind CSS agar tidak terjadi flicker
 
 ---
 
-## Files Modified
+## 8. Default Login Credentials
 
-### New Files Created
-- `public/src/assets/css/light-mode-override.css` - Light mode color overrides
+Data akun berikut dibuat oleh `UserSeeder` saat menjalankan `php artisan migrate --seed`.
 
-### Updated Files
+> ⚠️ **Ganti semua password ini segera setelah pertama kali login di lingkungan produksi.**
 
-#### User Pages
-1. `public/src/user/dashboard.php`
-   - Added CSS link
-   - Removed inline styles
-   - Added `bg-white` class to cards
-   - Updated BPS colors
+### Akun Admin
 
-2. `public/src/user/scan.php`
-   - Added CSS link
-   - Removed inline styles
-   - Maintained existing blue buttons
+| Field | Nilai |
+|-------|-------|
+| Email | `admin@bps.go.id` |
+| Password | `password123` |
+| Role | Admin |
+| NIP | `198001012006041001` |
 
-#### Admin Pages
-3. `public/src/login.php`
-   - Added CSS link
-   - Removed inline styles
-   - Updated login button to BPS blue
+| Field | Nilai |
+|-------|-------|
+| Email | `dewi.kartika@bps.go.id` |
+| Password | `password123` |
+| Role | Admin |
+| NIP | `198505152008041002` |
 
-4. `public/src/admin/dashboard.php`
-   - Added CSS link
-   - Removed inline styles
-   - Updated header icon to BPS blue
-   - Updated stat cards
+### Akun User (Pegawai)
 
-5. `public/src/admin/daftar_barang.php`
-   - Added CSS link
-   - Removed inline styles
-   - Updated "Tambah Barang" button
+| Email | Password | NIP |
+|-------|----------|-----|
+| `budi.santoso@bps.go.id` | `password123` | `199001012015041001` |
+| `siti.nurhaliza@bps.go.id` | `password123` | `199505012018041001` |
+| `ahmad.wijaya@bps.go.id` | `password123` | `199808012020041001` |
+| `rina.wulandari@bps.go.id` | `password123` | `199203152019041003` |
+| `fajar.prasetyo@bps.go.id` | `password123` | `199607202021041004` |
 
-6. `public/src/admin/edit_barang.php`
-   - Added CSS link
-   - Removed inline styles
-   - Updated "Simpan" button
-
-7. `public/src/admin/tambah_barang.php`
-   - Added CSS link
-   - Removed inline styles
-
-8. `public/src/admin/histori.php`
-   - Added CSS link
-   - Removed inline styles
-   - Updated filter buttons
-   - Updated status badges with BPS colors
-
-9. `public/src/admin/scan_return.php`
-   - Added CSS link
-   - Removed inline styles
-   - Added dark mode support
-   - Updated loading spinner to BPS blue
-
-#### JavaScript
-10. `public/src/assets/js/main.js`
-    - Updated `getKetersediaanBadge()` with BPS colors
-    - Dark mode toggle functions
-    - Theme persistence in localStorage
+> Akun `hendra.gunawan@bps.go.id` berstatus **nonaktif** (`is_active = false`) dan tidak dapat login.
 
 ---
 
-## Verification
+## 9. Changelog / Riwayat Update
 
-### ✅ Light Mode Testing
-1. ✅ Background is #cfcfcf on all pages
-2. ✅ Cards are #e8e8e8 (soft gray)
-3. ✅ Headers are #f5f5f5 (very light gray)
-4. ✅ Form inputs are #f0f0f0
-5. ✅ Colors harmonize well together
-6. ✅ BPS blue used for primary actions
-7. ✅ Orange used sparingly for status badges
-
-### ✅ Dark Mode Testing
-1. ✅ Background is slate-900 (#0f172a)
-2. ✅ Cards are slate-800 (#1e293b)
-3. ✅ Headers are slate-800 (#1e293b)
-4. ✅ Toggle button works on all pages
-5. ✅ No light mode colors bleeding through
-6. ✅ Smooth transitions between modes
-7. ✅ Theme preference persists in localStorage
-
-### ✅ Cross-Page Consistency
-1. ✅ All pages use same color scheme
-2. ✅ Dark mode toggle icon updates correctly (sun/moon)
-3. ✅ Theme preference persists across page navigation
-4. ✅ BPS blue used consistently for primary actions
-5. ✅ Status colors consistent across all pages
-
-### ✅ Accessibility
-1. ✅ Color contrast ratios meet WCAG AA standards
-2. ✅ Text readable on all backgrounds
-3. ✅ Status colors distinguishable
-4. ✅ Dark mode provides better readability in low light
-
----
-
-## Task Checklist
-
-### Color Scheme Implementation
-- [x] Define BPS color palette
-- [x] Apply to login page
-- [x] Apply to admin dashboard
-- [x] Apply to user dashboard
-- [x] Apply to daftar barang page
-- [x] Apply to edit barang page
-- [x] Apply to scan pages
-
-### Dark Mode Support
-- [x] Add dark mode to scan_return.php
-- [x] Add dark mode to histori.php
-- [x] Add dark mode to tambah_barang.php
-- [x] Verify dark mode toggle on all pages
-- [x] Fix dark mode compatibility issues
-
-### Light Mode Custom Background (#cfcfcf)
-- [x] Change background to #cfcfcf for all pages
-- [x] Adjust card colors (#e8e8e8) to harmonize with background
-- [x] Adjust header colors (#f5f5f5) to harmonize with background
-- [x] Create CSS override file for light mode theming
-- [x] Apply CSS to all pages
-- [x] Fix dark mode conflicts with inline styles
-- [x] Remove all inline styles causing dark mode issues
+| Tanggal | Versi | Perubahan |
+|---------|-------|-----------|
+| 2025 | v0.1 | Build awal — arsitektur legacy PHP (public/src/) |
+| 2026-01 | v1.0 | Migrasi penuh ke **Laravel 12** |
+| 2026-01 | v1.1 | Tambah fitur: Stock Opname, Waitlist, Tiket Kerusakan |
+| 2026-01 | v1.2 | Tambah: Audit Log, Dark Mode, BPS Color Scheme |
+| 2026-01 | v1.3 | Tambah: Perpanjangan peminjaman, overdue notifikasi |
+| 2026-04 | v1.4 | Tambah: **Foto Barang** (upload ke storage) |
+| 2026-04 | v1.4 | Tambah: **Avatar User** (UI Avatars fallback + upload opsional) |
+| 2026-04 | v1.5 | Perbaikan dokumentasi BPS QR Format (indeks segmen parser) |
 - [x] Verify light/dark mode switching works correctly
 
 ### Final Verification
