@@ -218,7 +218,7 @@
             <div class="label-card">
                 <div class="label-qr" id="qr-{{ $item->id }}"></div>
                 <div class="label-info">
-                    <div class="label-header">Barang Milik Negara — BPS</div>
+                    <div class="label-header">Barang Milik Negara — BPS Jepara</div>
                     <div class="label-bmn">{{ $nomorBmn }}</div>
                     <div class="label-brand">{{ $item->brand }} {{ $item->tipe }}</div>
                     <div class="label-field"><strong>Kode:</strong> {{ $item->kode_barang }}</div>
