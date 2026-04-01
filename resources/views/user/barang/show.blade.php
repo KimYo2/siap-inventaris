@@ -190,26 +190,13 @@
                 const result = await response.json();
 
                 if (result.success) {
-                    // Show success feedback (using simple alert for now, can be improved to Toast if available in layout)
-                    // Assuming layout has showToast or similar from legacy scripts?
-                    // Let's use standard alert for safety or reuse legacy showToast if included in layouts.app
-
-                    // Check if showToast exists (from legacy main.js)
-                    if (typeof showToast === 'function') {
-                        showToast('Peminjaman berhasil diajukan!', 'success');
-                    } else {
-                        alert('Peminjaman berhasil diajukan!');
-                    }
+                    alert('Peminjaman berhasil diajukan!');
 
                     setTimeout(() => {
                         window.location.href = result.redirect_url;
                     }, 1000);
                 } else {
-                    if (typeof showToast === 'function') {
-                        showToast(result.message || 'Terjadi kesalahan', 'error');
-                    } else {
-                        alert(result.message || 'Terjadi kesalahan');
-                    }
+                    alert(result.message || 'Terjadi kesalahan');
                     btn.disabled = false;
                     btn.innerHTML = originalText;
                 }

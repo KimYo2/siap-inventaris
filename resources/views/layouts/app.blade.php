@@ -7,7 +7,6 @@
     <title>@yield('title', 'Sistem Peminjaman BMN')</title>
     <link rel="icon" href="{{ asset('bps_logo.png') }}" type="image/png">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <!-- <link rel="stylesheet" href="/src/assets/css/light-mode-override.css?v=3"> -->
     <script>
         window.tailwind = window.tailwind || {};
         window.tailwind.config = {

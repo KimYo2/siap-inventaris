@@ -109,12 +109,3 @@ Route::get('/', function () {
 Route::get('/login', [App\Http\Controllers\Auth\LoginController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [App\Http\Controllers\Auth\LoginController::class, 'login']);
 Route::post('/logout', [App\Http\Controllers\Auth\LoginController::class, 'logout'])->name('logout');
-
-// Protected Routes Group (Optional: Add middleware later)
-// For now, simple grouping or just list them.
-// Ideally we should wrap these with 'auth' middleware manually or in controller constructor.
-
-
-Route::get('/src/{any?}', function () {
-    abort(404);
-})->where('any', '.*');
