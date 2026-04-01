@@ -62,43 +62,54 @@
                         @auth
                             @if(Auth::user()->role === 'admin')
                                 <a href="{{ route('admin.dashboard') }}"
-                                    class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium {{ request()->routeIs('admin.dashboard') ? 'border-blue-500 text-gray-900 dark:text-white' : '' }}">
+                                    class="border-transparent text-gray-500 dark:text-gray-400 hover:border-gray-300 hover:text-gray-700 dark:hover:text-gray-200 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-colors {{ request()->routeIs('admin.dashboard') ? 'border-blue-500 text-gray-900 dark:text-white' : '' }}">
                                     Dashboard
                                 </a>
                                 <a href="{{ route('admin.barang.index') }}"
-                                    class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium {{ request()->routeIs('admin.barang.*') ? 'border-blue-500 text-gray-900 dark:text-white' : '' }}">
+                                    class="border-transparent text-gray-500 dark:text-gray-400 hover:border-gray-300 hover:text-gray-700 dark:hover:text-gray-200 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-colors {{ request()->routeIs('admin.barang.*') ? 'border-blue-500 text-gray-900 dark:text-white' : '' }}">
                                     Barang
                                 </a>
                                 <a href="{{ route('admin.opname.index') }}"
-                                    class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium {{ request()->routeIs('admin.opname.*') ? 'border-blue-500 text-gray-900 dark:text-white' : '' }}">
+                                    class="border-transparent text-gray-500 dark:text-gray-400 hover:border-gray-300 hover:text-gray-700 dark:hover:text-gray-200 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-colors {{ request()->routeIs('admin.opname.*') ? 'border-blue-500 text-gray-900 dark:text-white' : '' }}">
                                     Opname
                                 </a>
                                 <a href="{{ route('admin.histori.index') }}"
-                                    class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium {{ request()->routeIs('admin.histori.*') ? 'border-blue-500 text-gray-900 dark:text-white' : '' }}">
+                                    class="border-transparent text-gray-500 dark:text-gray-400 hover:border-gray-300 hover:text-gray-700 dark:hover:text-gray-200 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-colors {{ request()->routeIs('admin.histori.*') ? 'border-blue-500 text-gray-900 dark:text-white' : '' }}">
                                     Histori
                                 </a>
                                 <a href="{{ route('admin.tiket.index') }}"
-                                    class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium {{ request()->routeIs('admin.tiket.*') ? 'border-blue-500 text-gray-900 dark:text-white' : '' }}">
+                                    class="border-transparent text-gray-500 dark:text-gray-400 hover:border-gray-300 hover:text-gray-700 dark:hover:text-gray-200 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-colors {{ request()->routeIs('admin.tiket.*') ? 'border-blue-500 text-gray-900 dark:text-white' : '' }}">
                                     Tiket
                                 </a>
                                 <a href="{{ route('admin.users.index') }}"
-                                    class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium {{ request()->routeIs('admin.users.*') ? 'border-blue-500 text-gray-900 dark:text-white' : '' }}">
+                                    class="border-transparent text-gray-500 dark:text-gray-400 hover:border-gray-300 hover:text-gray-700 dark:hover:text-gray-200 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-colors {{ request()->routeIs('admin.users.*') ? 'border-blue-500 text-gray-900 dark:text-white' : '' }}">
                                     User
                                 </a>
                                 <a href="{{ route('admin.kategori.index') }}"
-                                    class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium {{ request()->routeIs('admin.kategori.*') ? 'border-blue-500 text-gray-900 dark:text-white' : '' }}">
+                                    class="border-transparent text-gray-500 dark:text-gray-400 hover:border-gray-300 hover:text-gray-700 dark:hover:text-gray-200 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-colors {{ request()->routeIs('admin.kategori.*') ? 'border-blue-500 text-gray-900 dark:text-white' : '' }}">
                                     Kategori
                                 </a>
                                 <a href="{{ route('admin.ruangan.index') }}"
-                                    class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium {{ request()->routeIs('admin.ruangan.*') ? 'border-blue-500 text-gray-900 dark:text-white' : '' }}">
+                                    class="border-transparent text-gray-500 dark:text-gray-400 hover:border-gray-300 hover:text-gray-700 dark:hover:text-gray-200 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-colors {{ request()->routeIs('admin.ruangan.*') ? 'border-blue-500 text-gray-900 dark:text-white' : '' }}">
                                     Ruangan
                                 </a>
                             @else
                                 <a href="{{ route('user.dashboard') }}"
-                                    class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium {{ request()->routeIs('user.dashboard') ? 'border-blue-500 text-gray-900 dark:text-white' : '' }}">
+                                    class="border-transparent text-gray-500 dark:text-gray-400 hover:border-gray-300 hover:text-gray-700 dark:hover:text-gray-200 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-colors {{ request()->routeIs('user.dashboard') ? 'border-blue-500 text-gray-900 dark:text-white' : '' }}">
                                     Dashboard
                                 </a>
-                                <!-- Add User specific links here if needed -->
+                                <a href="{{ route('user.scan') }}"
+                                    class="border-transparent text-gray-500 dark:text-gray-400 hover:border-gray-300 hover:text-gray-700 dark:hover:text-gray-200 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-colors {{ request()->routeIs('user.scan') ? 'border-blue-500 text-gray-900 dark:text-white' : '' }}">
+                                    Pinjam Barang
+                                </a>
+                                <a href="{{ route('user.histori.index') }}"
+                                    class="border-transparent text-gray-500 dark:text-gray-400 hover:border-gray-300 hover:text-gray-700 dark:hover:text-gray-200 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-colors {{ request()->routeIs('user.histori.*') ? 'border-blue-500 text-gray-900 dark:text-white' : '' }}">
+                                    Riwayat Saya
+                                </a>
+                                <a href="{{ route('return.index') }}"
+                                    class="border-transparent text-gray-500 dark:text-gray-400 hover:border-gray-300 hover:text-gray-700 dark:hover:text-gray-200 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-colors {{ request()->routeIs('return.*') ? 'border-blue-500 text-gray-900 dark:text-white' : '' }}">
+                                    Kembalikan
+                                </a>
                             @endif
                         @endauth
                     </div>
