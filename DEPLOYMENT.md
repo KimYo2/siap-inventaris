@@ -110,8 +110,8 @@ apt install -y nodejs
 
 ```bash
 cd /var/www
-git clone https://github.com/KimYo2/Sistem-Peminjaman-BMN.git bmn
-cd bmn
+git clone https://github.com/KimYo2/siap-inventaris.git siap
+cd siap
 ```
 
 ### Step 4: Install dependencies
@@ -143,7 +143,7 @@ APP_URL=http://IP_ATAU_DOMAIN_KAMU
 DB_CONNECTION=mysql
 DB_HOST=127.0.0.1
 DB_PORT=3306
-DB_DATABASE=pinjam_qr
+DB_DATABASE=siap
 DB_USERNAME=bmn_user
 DB_PASSWORD=password_kuat_kamu
 ```
@@ -157,9 +157,9 @@ mysql -u root -p
 Di dalam MySQL, jalankan perintah berikut:
 
 ```sql
-CREATE DATABASE pinjam_qr CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE DATABASE siap CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 CREATE USER 'bmn_user'@'localhost' IDENTIFIED BY 'password_kuat_kamu';
-GRANT ALL PRIVILEGES ON pinjam_qr.* TO 'bmn_user'@'localhost';
+GRANT ALL PRIVILEGES ON siap.* TO 'bmn_user'@'localhost';
 FLUSH PRIVILEGES;
 EXIT;
 ```
@@ -174,10 +174,10 @@ php artisan migrate --seed
 
 ```bash
 php artisan storage:link
-chown -R www-data:www-data /var/www/bmn/storage
-chown -R www-data:www-data /var/www/bmn/bootstrap/cache
-chmod -R 775 /var/www/bmn/storage
-chmod -R 775 /var/www/bmn/bootstrap/cache
+chown -R www-data:www-data /var/www/siap/storage
+chown -R www-data:www-data /var/www/siap/bootstrap/cache
+chmod -R 775 /var/www/siap/storage
+chmod -R 775 /var/www/siap/bootstrap/cache
 ```
 
 ### Step 8: Konfigurasi Nginx
@@ -185,7 +185,7 @@ chmod -R 775 /var/www/bmn/bootstrap/cache
 Buat file konfigurasi baru:
 
 ```bash
-nano /etc/nginx/sites-available/bmn
+nano /etc/nginx/sites-available/siap
 ```
 
 Paste konfigurasi berikut:
@@ -194,7 +194,7 @@ Paste konfigurasi berikut:
 server {
     listen 80;
     server_name IP_ATAU_DOMAIN_KAMU;
-    root /var/www/bmn/public;
+    root /var/www/siap/public;
     index index.php index.html;
 
     add_header X-Frame-Options "SAMEORIGIN";
@@ -228,7 +228,7 @@ server {
 Aktifkan konfigurasi dan reload Nginx:
 
 ```bash
-ln -s /etc/nginx/sites-available/bmn /etc/nginx/sites-enabled/
+ln -s /etc/nginx/sites-available/siap /etc/nginx/sites-enabled/
 nginx -t
 systemctl reload nginx
 ```
@@ -273,8 +273,8 @@ Pilihan ini cocok untuk kantor BPS yang ingin menjalankan sistem di PC internal 
 
 ```bash
 cd C:\laragon\www
-git clone https://github.com/KimYo2/Sistem-Peminjaman-BMN.git bmn
-cd bmn
+git clone https://github.com/KimYo2/siap-inventaris.git siap
+cd siap
 ```
 
 **3. Install dependencies:**
@@ -302,14 +302,14 @@ APP_URL=http://localhost
 DB_CONNECTION=mysql
 DB_HOST=127.0.0.1
 DB_PORT=3306
-DB_DATABASE=pinjam_qr
+DB_DATABASE=siap
 DB_USERNAME=root
 DB_PASSWORD=
 ```
 
 **5. Buat database:**
 
-Buka browser → `http://localhost/phpmyadmin` → buat database baru bernama `pinjam_qr`.
+Buka browser → `http://localhost/phpmyadmin` → buat database baru bernama `siap`.
 
 **6. Migrasi dan seed:**
 
@@ -320,11 +320,11 @@ php artisan storage:link
 
 **7. Akses aplikasi:**
 
-Klik kanan ikon Laragon di system tray → **www** → **bmn**, atau buka browser:
+Klik kanan ikon Laragon di system tray → **www** → **siap**, atau buka browser:
 
 ```
-http://bmn.test          (jika pretty URL aktif di Laragon)
-http://localhost/bmn/public
+http://siap.test          (jika pretty URL aktif di Laragon)
+http://localhost/siap/public
 ```
 
 **8. Agar bisa diakses dari HP atau komputer lain di jaringan kantor:**
@@ -332,7 +332,7 @@ http://localhost/bmn/public
 - Cari IP komputer server: buka Command Prompt → ketik `ipconfig` → catat **IPv4 Address** (contoh: `192.168.1.10`)
 - Dari perangkat lain di jaringan yang sama, buka browser dan akses:
   ```
-  http://192.168.1.10/bmn/public
+  http://192.168.1.10/siap/public
   ```
 - Pastikan **Windows Firewall** mengizinkan koneksi masuk di port 80.
   Jika diblokir, tambahkan rule via PowerShell (run as Administrator):
@@ -347,7 +347,7 @@ http://localhost/bmn/public
 Gunakan langkah-langkah ini setiap kali ada pembaruan kode dari repository:
 
 ```bash
-cd /var/www/bmn          # sesuaikan dengan folder project
+cd /var/www/siap          # sesuaikan dengan folder project
 
 # Pull perubahan terbaru
 git pull origin main
@@ -382,7 +382,7 @@ chown -R www-data:www-data storage bootstrap/cache
   ```
 - **Backup database secara rutin:**
   ```bash
-  mysqldump -u bmn_user -p pinjam_qr > backup_$(date +%Y%m%d).sql
+  mysqldump -u bmn_user -p siap > backup_$(date +%Y%m%d).sql
   ```
 
 ---
