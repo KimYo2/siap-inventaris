@@ -53,6 +53,6 @@ class LoginController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect('/login'); // Redirect to key login page
+        return redirect('/'); // Arahkan ke landing page, bukan form login langsung
     }
 }
