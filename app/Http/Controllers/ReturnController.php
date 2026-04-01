@@ -9,6 +9,7 @@ use App\Models\User;
 use App\Models\Waitlist;
 use App\Services\BmnParser;
 use App\Services\KondisiHistoryService;
+use App\Services\NotifikasiService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -65,7 +66,11 @@ class ReturnController extends Controller
             // Use found NUP from peminjaman if strict NUP was not possible (e.g. only code scanned)
             $target_nup = $peminjaman->nup;
 
-            DB::transaction(function () use ($peminjaman, $kode_barang, $target_nup, $waktu_kembali, $request, $user, $data) {
+            // Captured inside transaction for post-commit notification
+            $notifyWaitUser = null;
+            $notifyBarangKey = $kode_barang . ' NUP ' . $target_nup;
+
+            DB::transaction(function () use ($peminjaman, $kode_barang, $target_nup, $waktu_kembali, $request, $user, $data, &$notifyWaitUser) {
                 $isDamagedValue = $request->boolean('is_damaged');
                 $shouldCreateTicket = $isDamagedValue;
 
@@ -139,6 +144,8 @@ class ReturnController extends Controller
                             'notified_at' => $waktu_kembali,
                             'fulfilled_at' => $waktu_kembali,
                         ]);
+
+                        $notifyWaitUser = $waitUser;
                     } else {
                         $nextWaitlist->update([
                             'status' => 'cancelled',
@@ -147,6 +154,16 @@ class ReturnController extends Controller
                     }
                 }
             });
+
+            // Send waitlist notification after transaction commits
+            if ($notifyWaitUser) {
+                app(NotifikasiService::class)->send(
+                    $notifyWaitUser->id,
+                    'Giliran Antrian Anda Telah Tiba',
+                    "Giliran antrian Anda untuk barang {$notifyBarangKey} telah tiba. Pengajuan peminjaman otomatis telah dibuat dan menunggu persetujuan admin.",
+                    'waitlist'
+                );
+            }
 
             return response()->json([
                 'success' => true,

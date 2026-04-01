@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Http\Controllers\Concerns\LogsAudit;
 use App\Models\Barang;
 use App\Models\HistoriPeminjaman;
+use App\Models\User;
+use App\Services\NotifikasiService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -203,6 +205,19 @@ class HistoriController extends Controller
             'nip_peminjam' => $histori->nip_peminjam,
         ]);
 
+        $borrower = User::where('nip', $histori->nip_peminjam)->first();
+        if ($borrower) {
+            $namaBarang = $histori->kode_barang . ' NUP ' . $histori->nup;
+            app(NotifikasiService::class)->send(
+                $borrower->id,
+                'Peminjaman Disetujui',
+                "Peminjaman {$namaBarang} Anda telah disetujui. Silakan ambil barang.",
+                'approval',
+                'histori_peminjaman',
+                $histori->id
+            );
+        }
+
         return redirect()->back()->with('success', 'Peminjaman disetujui.');
     }
 
@@ -233,6 +248,20 @@ class HistoriController extends Controller
             'nip_peminjam' => $histori->nip_peminjam,
             'reason' => $request->rejection_reason,
         ]);
+
+        $borrower = User::where('nip', $histori->nip_peminjam)->first();
+        if ($borrower) {
+            $namaBarang = $histori->kode_barang . ' NUP ' . $histori->nup;
+            $alasan = $request->rejection_reason ? 'Alasan: ' . $request->rejection_reason : 'Tidak ada alasan yang diberikan.';
+            app(NotifikasiService::class)->send(
+                $borrower->id,
+                'Peminjaman Ditolak',
+                "Peminjaman {$namaBarang} Anda ditolak. {$alasan}",
+                'approval',
+                'histori_peminjaman',
+                $histori->id
+            );
+        }
 
         return redirect()->back()->with('success', 'Peminjaman ditolak.');
     }

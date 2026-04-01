@@ -6,6 +6,10 @@ use Illuminate\Support\Facades\Route;
 
 // Routes for New Features (Laravel 12 Standard)
 Route::middleware(['web', Authenticate::class])->group(function () {
+    // Notifikasi
+    Route::get('/notifikasi', [App\Http\Controllers\NotifikasiController::class, 'index'])->name('notifikasi.index');
+    Route::get('/notifikasi/{id}/read', [App\Http\Controllers\NotifikasiController::class, 'markRead'])->name('notifikasi.read');
+
     // Return Flow
     Route::get('/return', [App\Http\Controllers\ReturnController::class, 'index'])->name('return.index');
     Route::post('/return/store', [App\Http\Controllers\ReturnController::class, 'store'])->name('return.store');
