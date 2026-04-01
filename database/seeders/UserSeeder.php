@@ -8,9 +8,6 @@ use Illuminate\Support\Facades\Hash;
 
 class UserSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
         DB::table('users')->insert([
@@ -20,6 +17,17 @@ class UserSeeder extends Seeder
                 'email' => 'admin@bps.go.id',
                 'password' => Hash::make('password123'),
                 'role' => 'admin',
+                'is_active' => true,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'nip' => '198505152008041002',
+                'name' => 'Dewi Kartika',
+                'email' => 'dewi.kartika@bps.go.id',
+                'password' => Hash::make('password123'),
+                'role' => 'admin',
+                'is_active' => true,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
@@ -29,6 +37,7 @@ class UserSeeder extends Seeder
                 'email' => 'budi.santoso@bps.go.id',
                 'password' => Hash::make('password123'),
                 'role' => 'user',
+                'is_active' => true,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
@@ -38,6 +47,7 @@ class UserSeeder extends Seeder
                 'email' => 'siti.nurhaliza@bps.go.id',
                 'password' => Hash::make('password123'),
                 'role' => 'user',
+                'is_active' => true,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
@@ -47,6 +57,37 @@ class UserSeeder extends Seeder
                 'email' => 'ahmad.wijaya@bps.go.id',
                 'password' => Hash::make('password123'),
                 'role' => 'user',
+                'is_active' => true,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'nip' => '199203152019041003',
+                'name' => 'Rina Wulandari',
+                'email' => 'rina.wulandari@bps.go.id',
+                'password' => Hash::make('password123'),
+                'role' => 'user',
+                'is_active' => true,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'nip' => '199607202021041004',
+                'name' => 'Fajar Prasetyo',
+                'email' => 'fajar.prasetyo@bps.go.id',
+                'password' => Hash::make('password123'),
+                'role' => 'user',
+                'is_active' => true,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'nip' => '198812102014041005',
+                'name' => 'Hendra Gunawan',
+                'email' => 'hendra.gunawan@bps.go.id',
+                'password' => Hash::make('password123'),
+                'role' => 'user',
+                'is_active' => false, // contoh user nonaktif
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
