@@ -108,6 +108,7 @@
                 <div class="flex items-center gap-3">
                     <!-- Dark Mode Toggle -->
                     <button id="theme-toggle" type="button"
+                        aria-label="Ganti tema"
                         class="p-2 rounded-lg text-slate-500 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-700 transition-colors focus:outline-none focus:ring-2 focus:ring-slate-200 dark:focus:ring-slate-700">
                         <!-- Sun Icon -->
                         <svg id="theme-toggle-light-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20"
@@ -135,6 +136,7 @@
                         {{-- Notification Bell --}}
                         <div x-data="{ open: false }" class="relative">
                             <button @click="open = !open" type="button"
+                                aria-label="Lihat notifikasi"
                                 class="relative p-2 rounded-lg text-slate-500 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-700 transition-colors focus:outline-none focus:ring-2 focus:ring-slate-200 dark:focus:ring-slate-700"
                                 title="Notifikasi">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -233,6 +235,8 @@
                     <form method="POST" action="{{ route('logout') }}" class="inline">
                         @csrf
                         <button type="submit"
+                            @click.prevent="if(confirm('Yakin ingin keluar?')) $el.closest('form').submit()"
+                            aria-label="Keluar dari sistem"
                             class="p-2 rounded-lg text-red-600 hover:bg-slate-100 dark:text-red-500 dark:hover:bg-slate-700 transition-colors"
                             title="Logout">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

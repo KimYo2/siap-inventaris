@@ -75,7 +75,7 @@
                                     <span>Jatuh tempo: {{ \Carbon\Carbon::parse($item->tanggal_jatuh_tempo)->format('d M Y') }}</span>
                                 </div>
                             @endif
-                            
+
                             @if ($item->waktu_kembali)
                                 <div class="flex items-center gap-2">
                                     <svg class="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -95,18 +95,14 @@
             </div>
 
         @else
-            <!-- Empty State -->
-            <div class="text-center py-12 bg-white dark:bg-slate-800 rounded-lg border border-dashed border-slate-300 dark:border-slate-700">
-                <svg class="w-12 h-12 text-slate-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
-                </svg>
-                <h3 class="text-lg font-medium text-slate-900 dark:text-white">Belum ada riwayat</h3>
-                <p class="text-slate-500 dark:text-slate-400 mt-1">Anda belum pernah melakukan peminjaman barang.</p>
-                <div class="mt-4">
-                    <a href="{{ route('user.dashboard') }}" class="text-blue-600 dark:text-blue-400 hover:underline">
-                        Mulai Pinjam &rarr;
-                    </a>
-                </div>
+            <div class="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm">
+                <x-empty-state
+                    icon="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+                    title="Kamu belum pernah meminjam barang"
+                    description="Pinjam barang BMN dengan scan QR code untuk mulai aktivitas peminjaman."
+                    actionLabel="Pinjam Sekarang"
+                    actionRoute="{{ route('user.scan') }}"
+                />
             </div>
         @endif
     </div>
