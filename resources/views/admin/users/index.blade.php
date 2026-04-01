@@ -53,99 +53,96 @@
             </form>
         </div>
 
-        <div
-            class="bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden transition-colors">
-            <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-slate-200 dark:divide-slate-700">
-                    <thead class="bg-slate-50 dark:bg-slate-900">
-                        <tr>
-                            <th
-                                class="px-6 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-                                NIP</th>
-                            <th
-                                class="px-6 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-                                Nama</th>
-                            <th
-                                class="px-6 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-                                Email</th>
-                            <th
-                                class="px-6 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-                                Role</th>
-                            <th
-                                class="px-6 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-                                Status</th>
-                            <th
-                                class="px-6 py-3 text-right text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-                                Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-slate-200 dark:divide-slate-700">
-                        @forelse($users as $user)
-                            <tr class="hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors">
-                                <td class="px-6 py-4 text-sm font-mono text-slate-700 dark:text-slate-300">
-                                    {{ $user->nip }}
-                                </td>
-                                <td class="px-6 py-4 text-sm text-slate-900 dark:text-white font-medium">
-                                    {{ $user->name }}
-                                </td>
-                                <td class="px-6 py-4 text-sm text-slate-600 dark:text-slate-400">
-                                    {{ $user->email }}
-                                </td>
-                                <td class="px-6 py-4">
-                                    <span @class([
-                                        'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium',
-                                        'bg-purple-100 text-purple-800 dark:bg-purple-900/50 dark:text-purple-300' => $user->role === 'admin',
-                                        'bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300' => $user->role === 'user',
-                                    ])>
-                                        {{ ucfirst($user->role) }}
-                                    </span>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <span @class([
-                                        'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium',
-                                        'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300' => $user->is_active,
-                                        'bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-300' => !$user->is_active,
-                                    ])>
-                                        {{ $user->is_active ? 'Aktif' : 'Nonaktif' }}
-                                    </span>
-                                </td>
-                                <td class="px-6 py-4 text-right">
-                                    <div class="flex items-center justify-end gap-2">
-                                        <a href="{{ route('admin.users.edit', $user->id) }}"
-                                            class="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 text-sm font-medium transition">
-                                            Edit
-                                        </a>
-                                        @if($user->id !== Auth::id())
-                                            @if($user->is_active)
-                                                <form action="{{ route('admin.users.destroy', $user->id) }}" method="POST"
-                                                    onsubmit="return confirm('Nonaktifkan user {{ $user->name }}?')">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit"
-                                                        class="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 text-sm font-medium transition">
-                                                        Nonaktifkan
-                                                    </button>
-                                                </form>
-                                            @endif
+        <x-responsive-table>
+                <thead class="bg-slate-50 dark:bg-slate-800/50">
+                    <tr>
+                        <th
+                            class="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider whitespace-nowrap">
+                            NIP</th>
+                        <th
+                            class="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider whitespace-nowrap">
+                            Nama</th>
+                        <th
+                            class="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider whitespace-nowrap">
+                            Email</th>
+                        <th
+                            class="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider whitespace-nowrap">
+                            Role</th>
+                        <th
+                            class="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider whitespace-nowrap">
+                            Status</th>
+                        <th
+                            class="px-4 py-3 text-right text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider whitespace-nowrap">
+                            Aksi</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white dark:bg-slate-800 divide-y divide-slate-100 dark:divide-slate-700">
+                    @forelse($users as $user)
+                        <tr class="hover:bg-slate-50 dark:hover:bg-slate-700/30 transition-colors">
+                            <td class="px-4 py-3 text-sm font-mono text-slate-700 dark:text-slate-300">
+                                {{ $user->nip }}
+                            </td>
+                            <td class="px-4 py-3 text-sm text-slate-900 dark:text-white font-medium">
+                                {{ $user->name }}
+                            </td>
+                            <td class="px-4 py-3 text-sm text-slate-700 dark:text-slate-300">
+                                {{ $user->email }}
+                            </td>
+                            <td class="px-4 py-3">
+                                <span @class([
+                                    'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium',
+                                    'bg-purple-100 text-purple-800 dark:bg-purple-900/50 dark:text-purple-300' => $user->role === 'admin',
+                                    'bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300' => $user->role === 'user',
+                                ])>
+                                    {{ ucfirst($user->role) }}
+                                </span>
+                            </td>
+                            <td class="px-4 py-3">
+                                <span @class([
+                                    'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium',
+                                    'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300' => $user->is_active,
+                                    'bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-300' => !$user->is_active,
+                                ])>
+                                    {{ $user->is_active ? 'Aktif' : 'Nonaktif' }}
+                                </span>
+                            </td>
+                            <td class="px-4 py-3 text-right">
+                                <div class="flex items-center justify-end gap-1">
+                                    <a href="{{ route('admin.users.edit', $user->id) }}" title="Edit"
+                                        class="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 text-sm font-medium transition inline-flex items-center gap-1 px-2 py-1 rounded hover:bg-blue-50 dark:hover:bg-blue-900/30">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+                                        <span class="hidden sm:inline">Edit</span>
+                                    </a>
+                                    @if($user->id !== Auth::id())
+                                        @if($user->is_active)
+                                            <form action="{{ route('admin.users.destroy', $user->id) }}" method="POST"
+                                                onsubmit="return confirm('Nonaktifkan user {{ $user->name }}?')">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" title="Nonaktifkan"
+                                                    class="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 text-sm font-medium transition inline-flex items-center gap-1 px-2 py-1 rounded hover:bg-red-50 dark:hover:bg-red-900/30">
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" /></svg>
+                                                    <span class="hidden sm:inline">Nonaktifkan</span>
+                                                </button>
+                                            </form>
                                         @endif
-                                    </div>
-                                </td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="6" class="px-6 py-8 text-center text-sm text-slate-500 dark:text-slate-400">
-                                    Tidak ada user ditemukan.
-                                </td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
-        </div>
+                                    @endif
+                                </div>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="6" class="px-4 py-8 text-center text-sm text-slate-500 dark:text-slate-400">
+                                Tidak ada user ditemukan.
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
 
-        <div class="mt-4">
-            {{ $users->links() }}
-        </div>
+            <x-slot:pagination>
+                {{ $users->links() }}
+            </x-slot:pagination>
+        </x-responsive-table>
 
     </div>
 @endsection

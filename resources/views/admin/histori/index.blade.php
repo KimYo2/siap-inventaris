@@ -108,142 +108,140 @@
         </div>
 
         <!-- Histori List -->
-        <div
-            class="bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden transition-colors">
-            <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-slate-200 dark:divide-slate-700">
-                    <thead
-                        class="bg-slate-50 dark:bg-slate-700/50 text-slate-500 dark:text-slate-400 text-xs font-semibold uppercase tracking-wider transition-colors">
-                        <tr>
-                            <th class="px-6 py-3 text-left">Nomor BMN</th>
-                            <th class="px-6 py-3 text-left">Peminjam</th>
-                            <th class="px-6 py-3 text-left">NIP</th>
-                            <th class="px-6 py-3 text-left">Waktu Pinjam</th>
-                            <th class="px-6 py-3 text-left">Waktu Kembali</th>
-                            <th class="px-6 py-3 text-left">Jatuh Tempo</th>
-                            <th class="px-6 py-3 text-left">Status</th>
-                            <th class="px-6 py-3 text-left">Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody
-                        class="bg-white dark:bg-slate-800 divide-y divide-slate-200 dark:divide-slate-700 text-sm transition-colors">
-                        @forelse($histori as $item)
-                            <tr class="hover:bg-slate-50 dark:hover:bg-slate-700/50 transition duration-150">
-                                <td class="px-6 py-4 whitespace-nowrap font-medium text-slate-900 dark:text-white">
-                                    {{ $item->kode_barang }}-{{ $item->nup }}
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-slate-600 dark:text-slate-300">
-                                    {{ $item->nama_peminjam ?? '-' }}</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-slate-500 dark:text-slate-400 font-mono text-xs">
-                                    {{ $item->nip_peminjam }}</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-slate-600 dark:text-slate-300">
-                                    @if($item->waktu_pinjam)
-                                        {{ \Carbon\Carbon::parse($item->waktu_pinjam)->format('d/m/Y H:i') }}
-                                    @elseif($item->waktu_pengajuan)
-                                        {{ \Carbon\Carbon::parse($item->waktu_pengajuan)->format('d/m/Y H:i') }}
-                                    @else
-                                        -
-                                    @endif
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-slate-600 dark:text-slate-300">
-                                    {{ $item->waktu_kembali ? \Carbon\Carbon::parse($item->waktu_kembali)->format('d/m/Y H:i') : '-' }}
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-slate-600 dark:text-slate-300">
-                                    {{ $item->tanggal_jatuh_tempo ? \Carbon\Carbon::parse($item->tanggal_jatuh_tempo)->format('d/m/Y') : '-' }}
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
+        <x-responsive-table>
+                <thead
+                    class="bg-slate-50 dark:bg-slate-800/50">
+                    <tr>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider whitespace-nowrap">Nomor BMN</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider whitespace-nowrap">Peminjam</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider whitespace-nowrap">NIP</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider whitespace-nowrap">Waktu Pinjam</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider whitespace-nowrap">Waktu Kembali</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider whitespace-nowrap">Jatuh Tempo</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider whitespace-nowrap">Status</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider whitespace-nowrap">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody
+                    class="bg-white dark:bg-slate-800 divide-y divide-slate-100 dark:divide-slate-700 text-sm transition-colors">
+                    @forelse($histori as $item)
+                        <tr class="hover:bg-slate-50 dark:hover:bg-slate-700/30 transition-colors">
+                            <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-slate-900 dark:text-white">
+                                {{ $item->kode_barang }}-{{ $item->nup }}
+                            </td>
+                            <td class="px-4 py-3 whitespace-nowrap text-sm text-slate-700 dark:text-slate-300">
+                                {{ $item->nama_peminjam ?? '-' }}</td>
+                            <td class="px-4 py-3 whitespace-nowrap text-sm text-slate-500 dark:text-slate-400 font-mono text-xs">
+                                {{ $item->nip_peminjam }}</td>
+                            <td class="px-4 py-3 whitespace-nowrap text-sm text-slate-700 dark:text-slate-300">
+                                @if($item->waktu_pinjam)
+                                    {{ \Carbon\Carbon::parse($item->waktu_pinjam)->format('d/m/Y H:i') }}
+                                @elseif($item->waktu_pengajuan)
+                                    {{ \Carbon\Carbon::parse($item->waktu_pengajuan)->format('d/m/Y H:i') }}
+                                @else
+                                    -
+                                @endif
+                            </td>
+                            <td class="px-4 py-3 whitespace-nowrap text-sm text-slate-700 dark:text-slate-300">
+                                {{ $item->waktu_kembali ? \Carbon\Carbon::parse($item->waktu_kembali)->format('d/m/Y H:i') : '-' }}
+                            </td>
+                            <td class="px-4 py-3 whitespace-nowrap text-sm text-slate-700 dark:text-slate-300">
+                                {{ $item->tanggal_jatuh_tempo ? \Carbon\Carbon::parse($item->tanggal_jatuh_tempo)->format('d/m/Y') : '-' }}
+                            </td>
+                            <td class="px-4 py-3 whitespace-nowrap">
+                                <span
+                                    class="px-2.5 py-0.5 inline-flex text-xs leading-5 font-semibold rounded-md border
+                                        {{ $item->status_badge_class }}">
+                                    {{ $item->status_label }}
+                                </span>
+                                @if($item->status === 'dipinjam' && $item->tanggal_jatuh_tempo && \Carbon\Carbon::parse($item->tanggal_jatuh_tempo)->isPast())
                                     <span
-                                        class="px-2.5 py-0.5 inline-flex text-xs leading-5 font-semibold rounded-md border
-                                            {{ $item->status_badge_class }}">
-                                        {{ $item->status_label }}
+                                        class="ml-1 px-2 py-0.5 inline-flex text-xs leading-5 font-semibold rounded-md border bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 border-red-200 dark:border-red-800">
+                                        Terlambat
                                     </span>
-                                    @if($item->status === 'dipinjam' && $item->tanggal_jatuh_tempo && \Carbon\Carbon::parse($item->tanggal_jatuh_tempo)->isPast())
-                                        <span
-                                            class="ml-2 px-2 py-0.5 inline-flex text-xs leading-5 font-semibold rounded-md border bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 border-red-200 dark:border-red-800">
-                                            Terlambat
-                                        </span>
-                                    @endif
-                                    @if($item->perpanjangan_status === 'menunggu')
-                                        <span
-                                            class="ml-2 px-2 py-0.5 inline-flex text-xs leading-5 font-semibold rounded-md border bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-800">
-                                            Perpanjangan Menunggu
-                                        </span>
-                                    @elseif($item->perpanjangan_status === 'disetujui')
-                                        <span
-                                            class="ml-2 px-2 py-0.5 inline-flex text-xs leading-5 font-semibold rounded-md border bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800">
-                                            Perpanjangan Disetujui
-                                        </span>
-                                    @elseif($item->perpanjangan_status === 'ditolak')
-                                        <span
-                                            class="ml-2 px-2 py-0.5 inline-flex text-xs leading-5 font-semibold rounded-md border bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 border-red-200 dark:border-red-800">
-                                            Perpanjangan Ditolak
-                                        </span>
-                                    @endif
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    @if($item->status === 'menunggu')
-                                        <div class="flex items-center gap-2">
-                                            <form method="POST" action="{{ route('admin.histori.approve', $item->id) }}">
-                                                @csrf
-                                                <button type="submit"
-                                                    class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold px-3 py-1.5 rounded-md transition">
-                                                    Setujui
-                                                </button>
-                                            </form>
-                                            <form method="POST" action="{{ route('admin.histori.reject', $item->id) }}">
-                                                @csrf
-                                                <input type="hidden" name="rejection_reason" value="Ditolak admin">
-                                                <button type="submit"
-                                                    class="bg-red-600 hover:bg-red-700 text-white text-xs font-semibold px-3 py-1.5 rounded-md transition">
-                                                    Tolak
-                                                </button>
-                                            </form>
-                                        </div>
-                                    @elseif($item->status === 'dipinjam' && $item->perpanjangan_status === 'menunggu')
-                                        <div class="flex items-center gap-2">
-                                            <form method="POST" action="{{ route('admin.histori.extend.approve', $item->id) }}">
-                                                @csrf
-                                                <button type="submit"
-                                                    class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold px-3 py-1.5 rounded-md transition">
-                                                    Setujui Perpanjangan
-                                                </button>
-                                            </form>
-                                            <form method="POST" action="{{ route('admin.histori.extend.reject', $item->id) }}">
-                                                @csrf
-                                                <input type="hidden" name="perpanjangan_reject_reason" value="Ditolak admin">
-                                                <button type="submit"
-                                                    class="bg-red-600 hover:bg-red-700 text-white text-xs font-semibold px-3 py-1.5 rounded-md transition">
-                                                    Tolak Perpanjangan
-                                                </button>
-                                            </form>
-                                        </div>
-                                    @else
-                                        <span class="text-xs text-slate-400 dark:text-slate-500">-</span>
-                                    @endif
-                                </td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="8" class="px-6 py-12 text-center text-slate-400 dark:text-slate-500">
-                                    <svg class="w-12 h-12 mx-auto mb-3 text-slate-300 dark:text-slate-600" fill="none"
-                                        stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
-                                        </path>
-                                    </svg>
-                                    <p class="text-sm">Tidak ada riwayat peminjaman.</p>
-                                </td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
+                                @endif
+                                @if($item->perpanjangan_status === 'menunggu')
+                                    <span
+                                        class="ml-1 px-2 py-0.5 inline-flex text-xs leading-5 font-semibold rounded-md border bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-800">
+                                        <span class="hidden sm:inline">Perpanjangan </span>Menunggu
+                                    </span>
+                                @elseif($item->perpanjangan_status === 'disetujui')
+                                    <span
+                                        class="ml-1 px-2 py-0.5 inline-flex text-xs leading-5 font-semibold rounded-md border bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800">
+                                        <span class="hidden sm:inline">Perpanjangan </span>Disetujui
+                                    </span>
+                                @elseif($item->perpanjangan_status === 'ditolak')
+                                    <span
+                                        class="ml-1 px-2 py-0.5 inline-flex text-xs leading-5 font-semibold rounded-md border bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 border-red-200 dark:border-red-800">
+                                        <span class="hidden sm:inline">Perpanjangan </span>Ditolak
+                                    </span>
+                                @endif
+                            </td>
+                            <td class="px-4 py-3 whitespace-nowrap">
+                                @if($item->status === 'menunggu')
+                                    <div class="flex items-center gap-1">
+                                        <form method="POST" action="{{ route('admin.histori.approve', $item->id) }}">
+                                            @csrf
+                                            <button type="submit" title="Setujui"
+                                                class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold px-2 sm:px-3 py-1.5 rounded-md transition inline-flex items-center gap-1">
+                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+                                                <span class="hidden sm:inline">Setujui</span>
+                                            </button>
+                                        </form>
+                                        <form method="POST" action="{{ route('admin.histori.reject', $item->id) }}">
+                                            @csrf
+                                            <input type="hidden" name="rejection_reason" value="Ditolak admin">
+                                            <button type="submit" title="Tolak"
+                                                class="bg-red-600 hover:bg-red-700 text-white text-xs font-semibold px-2 sm:px-3 py-1.5 rounded-md transition inline-flex items-center gap-1">
+                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                                                <span class="hidden sm:inline">Tolak</span>
+                                            </button>
+                                        </form>
+                                    </div>
+                                @elseif($item->status === 'dipinjam' && $item->perpanjangan_status === 'menunggu')
+                                    <div class="flex items-center gap-1">
+                                        <form method="POST" action="{{ route('admin.histori.extend.approve', $item->id) }}">
+                                            @csrf
+                                            <button type="submit" title="Setujui Perpanjangan"
+                                                class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold px-2 sm:px-3 py-1.5 rounded-md transition inline-flex items-center gap-1">
+                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+                                                <span class="hidden sm:inline">Setujui</span>
+                                            </button>
+                                        </form>
+                                        <form method="POST" action="{{ route('admin.histori.extend.reject', $item->id) }}">
+                                            @csrf
+                                            <input type="hidden" name="perpanjangan_reject_reason" value="Ditolak admin">
+                                            <button type="submit" title="Tolak Perpanjangan"
+                                                class="bg-red-600 hover:bg-red-700 text-white text-xs font-semibold px-2 sm:px-3 py-1.5 rounded-md transition inline-flex items-center gap-1">
+                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                                                <span class="hidden sm:inline">Tolak</span>
+                                            </button>
+                                        </form>
+                                    </div>
+                                @else
+                                    <span class="text-xs text-slate-400 dark:text-slate-500">-</span>
+                                @endif
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="8" class="px-4 py-12 text-center text-slate-400 dark:text-slate-500">
+                                <svg class="w-12 h-12 mx-auto mb-3 text-slate-300 dark:text-slate-600" fill="none"
+                                    stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                                    </path>
+                                </svg>
+                                <p class="text-sm">Tidak ada riwayat peminjaman.</p>
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
 
-            <!-- Pagination -->
-            <div class="bg-white dark:bg-slate-800 px-4 py-3 border-t border-slate-200 dark:border-slate-700 sm:px-6">
+            <x-slot:pagination>
                 {{ $histori->links() }}
-            </div>
-        </div>
+            </x-slot:pagination>
+        </x-responsive-table>
 
     </div>
 @endsection

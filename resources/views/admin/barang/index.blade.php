@@ -116,117 +116,114 @@
         </div>
 
         <!-- Barang List -->
-        <div
-            class="bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden transition-colors">
-            <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-slate-200 dark:divide-slate-700">
-                    <thead
-                        class="bg-slate-50 dark:bg-slate-700/50 text-slate-500 dark:text-slate-400 text-xs font-semibold uppercase tracking-wider transition-colors">
-                        <tr>
-                            <th class="px-3 py-3 text-center w-10">
-                                <input type="checkbox" id="select-all"
-                                    class="rounded border-slate-300 dark:border-slate-600 text-blue-600 focus:ring-blue-500">
-                            </th>
-                            <th class="px-6 py-3 text-left">Nomor BMN</th>
-                            <th class="px-6 py-3 text-left">Brand</th>
-                            <th class="px-6 py-3 text-left">Tipe</th>
-                            <th class="px-6 py-3 text-left">Kategori</th>
-                            <th class="px-6 py-3 text-left">Ruangan</th>
-                            <th class="px-6 py-3 text-left">Kondisi</th>
-                            <th class="px-6 py-3 text-left">Status</th>
-                            <th class="px-6 py-3 text-left">Peminjam</th>
-                            <th class="px-6 py-3 text-left">PIC</th>
-                            <th class="px-6 py-3 text-center">Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody
-                        class="bg-white dark:bg-slate-800 divide-y divide-slate-200 dark:divide-slate-700 text-sm transition-colors">
-                        @forelse($barang as $item)
-                                        @php $isInactive = !$item->isAktif(); @endphp
-                                        <tr class="hover:bg-slate-50 dark:hover:bg-slate-700/50 transition duration-150 {{ $isInactive ? 'opacity-60' : '' }}">
-                                            <td class="px-3 py-4 text-center w-10">
-                                                <input type="checkbox" name="ids[]" value="{{ $item->id }}" form="bulk-qr-form"
-                                                    class="bulk-checkbox rounded border-slate-300 dark:border-slate-600 text-blue-600 focus:ring-blue-500">
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-nowrap font-medium text-slate-900 dark:text-white">
-                                                {{ $item->kode_barang }}-{{ $item->nup }}
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-nowrap text-slate-600 dark:text-slate-300">{{ $item->brand }}
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-nowrap text-slate-600 dark:text-slate-300">{{ $item->tipe }}
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-nowrap text-slate-600 dark:text-slate-300">
-                                                {{ $item->kategori ? $item->kategori->nama_kategori : '-' }}
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-nowrap text-slate-600 dark:text-slate-300">
-                                                {{ $item->ruangan ? $item->ruangan->nama_ruangan : '-' }}
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-nowrap">
-                                                <span
-                                                    class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium
-                                                                                                                    {{ $item->kondisi_badge_class }}">
-                                                    <span class="w-1.5 h-1.5 rounded-full
-                                                                                                                        {{ $item->kondisi_dot_class }}"></span>
-                                                    {{ $item->kondisi_label }}
+        <x-responsive-table>
+                <thead
+                    class="bg-slate-50 dark:bg-slate-800/50">
+                    <tr>
+                        <th class="px-4 py-3 text-center text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider w-10">
+                            <input type="checkbox" id="select-all"
+                                class="rounded border-slate-300 dark:border-slate-600 text-blue-600 focus:ring-blue-500">
+                        </th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider whitespace-nowrap">Nomor BMN</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider whitespace-nowrap">Brand</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider whitespace-nowrap">Tipe</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider whitespace-nowrap">Kategori</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider whitespace-nowrap">Ruangan</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider whitespace-nowrap">Kondisi</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider whitespace-nowrap">Status</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider whitespace-nowrap">Peminjam</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider whitespace-nowrap">PIC</th>
+                        <th class="px-4 py-3 text-center text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider whitespace-nowrap">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody
+                    class="bg-white dark:bg-slate-800 divide-y divide-slate-100 dark:divide-slate-700 text-sm transition-colors">
+                    @forelse($barang as $item)
+                                    @php $isInactive = !$item->isAktif(); @endphp
+                                    <tr class="hover:bg-slate-50 dark:hover:bg-slate-700/30 transition-colors {{ $isInactive ? 'opacity-60' : '' }}">
+                                        <td class="px-4 py-3 text-center w-10">
+                                            <input type="checkbox" name="ids[]" value="{{ $item->id }}" form="bulk-qr-form"
+                                                class="bulk-checkbox rounded border-slate-300 dark:border-slate-600 text-blue-600 focus:ring-blue-500">
+                                        </td>
+                                        <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-slate-900 dark:text-white">
+                                            {{ $item->kode_barang }}-{{ $item->nup }}
+                                        </td>
+                                        <td class="px-4 py-3 whitespace-nowrap text-sm text-slate-700 dark:text-slate-300">{{ $item->brand }}
+                                        </td>
+                                        <td class="px-4 py-3 whitespace-nowrap text-sm text-slate-700 dark:text-slate-300">{{ $item->tipe }}
+                                        </td>
+                                        <td class="px-4 py-3 whitespace-nowrap text-sm text-slate-700 dark:text-slate-300">
+                                            {{ $item->kategori ? $item->kategori->nama_kategori : '-' }}
+                                        </td>
+                                        <td class="px-4 py-3 whitespace-nowrap text-sm text-slate-700 dark:text-slate-300">
+                                            {{ $item->ruangan ? $item->ruangan->nama_ruangan : '-' }}
+                                        </td>
+                                        <td class="px-4 py-3 whitespace-nowrap">
+                                            <span
+                                                class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium
+                                                                                                                {{ $item->kondisi_badge_class }}">
+                                                <span class="w-1.5 h-1.5 rounded-full
+                                                                                                                    {{ $item->kondisi_dot_class }}"></span>
+                                                {{ $item->kondisi_label }}
+                                            </span>
+                                        </td>
+                                        <td class="px-4 py-3 whitespace-nowrap">
+                                            <span
+                                                class="px-2.5 py-0.5 inline-flex text-xs leading-5 font-semibold rounded-md
+                                                                                                                {{ $item->ketersediaan === 'tersedia' ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300' : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300' }}">
+                                                {{ ucfirst($item->ketersediaan) }}
+                                            </span>
+                                            @if(!$item->isAktif())
+                                                <span class="mt-1 px-2 py-0.5 inline-flex text-xs leading-5 font-semibold rounded-md {{ $item->status_barang_badge_class }}">
+                                                    {{ $item->status_barang_label }}
                                                 </span>
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-nowrap">
-                                                <span
-                                                    class="px-2.5 py-0.5 inline-flex text-xs leading-5 font-semibold rounded-md
-                                                                                                                    {{ $item->ketersediaan === 'tersedia' ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300' : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300' }}">
-                                                    {{ ucfirst($item->ketersediaan) }}
-                                                </span>
-                                                @if(!$item->isAktif())
-                                                    <span class="mt-1 px-2 py-0.5 inline-flex text-xs leading-5 font-semibold rounded-md {{ $item->status_barang_badge_class }}">
-                                                        {{ $item->status_barang_label }}
-                                                    </span>
-                                                @endif
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-nowrap text-slate-500 dark:text-slate-400 text-xs">
-                                                @if(!empty($item->peminjam_terakhir))
-                                                    <div class="text-slate-700 dark:text-slate-200 text-xs font-medium">
-                                                        {{ $item->peminjam_terakhir }}
-                                                    </div>
-                                                    <div class="text-[11px] text-slate-500 dark:text-slate-400">
-                                                        @if($item->ketersediaan === 'dipinjam')
-                                                            Dipinjam
-                                                            {{ $item->waktu_pinjam ? \Carbon\Carbon::parse($item->waktu_pinjam)->format('d/m/Y H:i') : '-' }}
-                                                        @elseif($item->waktu_kembali)
-                                                            Kembali
-                                                            {{ \Carbon\Carbon::parse($item->waktu_kembali)->format('d/m/Y H:i') }}
-                                                        @elseif($item->waktu_pinjam)
-                                                            Terakhir dipinjam
-                                                            {{ \Carbon\Carbon::parse($item->waktu_pinjam)->format('d/m/Y H:i') }}
-                                                        @else
-                                                            Terakhir dipinjam -
-                                                        @endif
-                                                    </div>
-                                                @else
-                                                    -
-                                                @endif
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-nowrap text-slate-600 dark:text-slate-300 text-xs">
-                                                {{ $item->pic ? $item->pic->nama : '-' }}
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-nowrap text-center">
-                                                <div class="flex items-center justify-center gap-2" x-data="{ openStatus: false }">
-                                                    <a href="{{ route('admin.barang.qr-label', $item->id) }}" target="_blank"
-                                                        title="Cetak QR"
-                                                        class="text-emerald-600 hover:text-emerald-900 dark:text-emerald-400 dark:hover:text-emerald-300 p-1 hover:bg-emerald-50 dark:hover:bg-emerald-900/30 rounded transition">
-                                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                                d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z">
-                                                            </path>
-                                                        </svg>
-                                                    </a>
-                                                    <a href="{{ route('admin.barang.edit', $item->id) }}"
-                                                        class="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300 p-1 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 rounded transition">
-                                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z">
-                                                            </path>
-                                                        </svg>
-                                                    </a>
+                                            @endif
+                                        </td>
+                                        <td class="px-4 py-3 whitespace-nowrap text-slate-500 dark:text-slate-400 text-xs">
+                                            @if(!empty($item->peminjam_terakhir))
+                                                <div class="text-slate-700 dark:text-slate-200 text-xs font-medium">
+                                                    {{ $item->peminjam_terakhir }}
+                                                </div>
+                                                <div class="text-[11px] text-slate-500 dark:text-slate-400">
+                                                    @if($item->ketersediaan === 'dipinjam')
+                                                        Dipinjam
+                                                        {{ $item->waktu_pinjam ? \Carbon\Carbon::parse($item->waktu_pinjam)->format('d/m/Y H:i') : '-' }}
+                                                    @elseif($item->waktu_kembali)
+                                                        Kembali
+                                                        {{ \Carbon\Carbon::parse($item->waktu_kembali)->format('d/m/Y H:i') }}
+                                                    @elseif($item->waktu_pinjam)
+                                                        Terakhir dipinjam
+                                                        {{ \Carbon\Carbon::parse($item->waktu_pinjam)->format('d/m/Y H:i') }}
+                                                    @else
+                                                        Terakhir dipinjam -
+                                                    @endif
+                                                </div>
+                                            @else
+                                                -
+                                            @endif
+                                        </td>
+                                        <td class="px-4 py-3 whitespace-nowrap text-sm text-slate-700 dark:text-slate-300 text-xs">
+                                            {{ $item->pic ? $item->pic->nama : '-' }}
+                                        </td>
+                                        <td class="px-4 py-3 whitespace-nowrap text-center">
+                                            <div class="flex items-center justify-center gap-1" x-data="{ openStatus: false }">
+                                                <a href="{{ route('admin.barang.qr-label', $item->id) }}" target="_blank"
+                                                    title="Cetak QR"
+                                                    class="text-emerald-600 hover:text-emerald-900 dark:text-emerald-400 dark:hover:text-emerald-300 p-1 hover:bg-emerald-50 dark:hover:bg-emerald-900/30 rounded transition">
+                                                    <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                            d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z">
+                                                        </path>
+                                                    </svg>
+                                                </a>
+                                                <a href="{{ route('admin.barang.edit', $item->id) }}" title="Edit"
+                                                    class="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300 p-1 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 rounded transition">
+                                                    <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z">
+                                                        </path>
+                                                    </svg>
+                                                </a>
 
                                                     {{-- Quick Status Change --}}
                                                     <button @click="openStatus = true" title="Ubah Status Barang"
@@ -323,16 +320,11 @@
                             </tr>
                         @endforelse
                     </tbody>
-                </table>
-            </div>
 
-            <!-- Pagination -->
-            <div class="bg-white dark:bg-slate-800 px-4 py-3 border-t border-slate-200 dark:border-slate-700 sm:px-6">
+            <x-slot:pagination>
                 {{ $barang->links() }}
-            </div>
-        </div>
-
-        </form>
+            </x-slot:pagination>
+        </x-responsive-table>
 
     </div>
 
