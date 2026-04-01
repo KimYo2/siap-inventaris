@@ -181,5 +181,99 @@
             </form>
         </div>
 
+        {{-- ===================== RIWAYAT KONDISI ===================== --}}
+        <div class="mt-8 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 shadow-sm p-6 sm:p-8 transition-colors">
+
+            <div class="flex items-center gap-2 mb-6">
+                <svg class="w-5 h-5 text-slate-500 dark:text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <h2 class="text-base font-bold text-slate-800 dark:text-white">Riwayat Kondisi Barang</h2>
+                <span class="ml-auto text-xs text-slate-400 dark:text-slate-500">{{ $kondisiHistory->count() }} entri</span>
+            </div>
+
+            @if($kondisiHistory->isEmpty())
+                <div class="flex flex-col items-center justify-center py-10 text-center">
+                    <svg class="w-10 h-10 text-slate-300 dark:text-slate-600 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                            d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                    </svg>
+                    <p class="text-sm text-slate-400 dark:text-slate-500">Belum ada riwayat perubahan kondisi</p>
+                </div>
+            @else
+                <ol class="relative border-l border-slate-200 dark:border-slate-700 ml-3 space-y-0">
+                    @foreach($kondisiHistory as $entry)
+                        <li class="mb-6 ml-6">
+                            {{-- Timeline dot --}}
+                            <span class="absolute -left-3 flex items-center justify-center w-6 h-6 rounded-full ring-4 ring-white dark:ring-slate-800
+                                {{ $entry->kondisi_baru === 'baik' ? 'bg-green-100 dark:bg-green-900/40' : ($entry->kondisi_baru === 'rusak_berat' ? 'bg-red-100 dark:bg-red-900/40' : 'bg-yellow-100 dark:bg-yellow-900/40') }}">
+                                <svg class="w-3 h-3 {{ $entry->kondisi_baru === 'baik' ? 'text-green-600 dark:text-green-400' : ($entry->kondisi_baru === 'rusak_berat' ? 'text-red-600 dark:text-red-400' : 'text-yellow-600 dark:text-yellow-400') }}"
+                                    fill="currentColor" viewBox="0 0 8 8">
+                                    <circle cx="4" cy="4" r="3" />
+                                </svg>
+                            </span>
+
+                            {{-- Header row: date + source badge --}}
+                            <div class="flex flex-wrap items-center gap-2 mb-1.5">
+                                <time class="text-xs font-medium text-slate-500 dark:text-slate-400">
+                                    {{ $entry->created_at->timezone('Asia/Jakarta')->format('d M Y, H:i') }} WIB
+                                </time>
+                                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium {{ $entry->source_badge_class }}">
+                                    {{ $entry->source_label }}
+                                    @if($entry->source === 'return' && $entry->source_id)
+                                        &nbsp;#{{ $entry->source_id }}
+                                    @elseif($entry->source === 'stock_opname' && $entry->source_id)
+                                        &nbsp;#{{ $entry->source_id }}
+                                    @endif
+                                </span>
+                                @if($entry->source === 'return' && $entry->source_id)
+                                    <a href="{{ route('admin.histori.index') }}"
+                                       class="text-xs text-blue-600 dark:text-blue-400 hover:underline">
+                                        Lihat histori →
+                                    </a>
+                                @endif
+                            </div>
+
+                            {{-- Kondisi change row --}}
+                            <div class="flex flex-wrap items-center gap-2 mb-1.5">
+                                @if($entry->kondisi_lama)
+                                    <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold {{ $entry->kondisi_lama_badge_class }}">
+                                        {{ $entry->kondisi_lama_label }}
+                                    </span>
+                                    <svg class="w-4 h-4 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                                    </svg>
+                                @else
+                                    <span class="text-xs text-slate-400 italic">kondisi awal</span>
+                                    <svg class="w-4 h-4 text-slate-300 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                                    </svg>
+                                @endif
+                                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold {{ $entry->kondisi_baru_badge_class }}">
+                                    {{ $entry->kondisi_baru_label }}
+                                </span>
+                            </div>
+
+                            {{-- Catatan & changed_by --}}
+                            <div class="text-xs text-slate-500 dark:text-slate-400 space-y-0.5">
+                                @if($entry->catatan)
+                                    <p class="italic">"{{ $entry->catatan }}"</p>
+                                @endif
+                                <p>
+                                    Oleh:
+                                    <span class="font-medium text-slate-700 dark:text-slate-300">
+                                        {{ $entry->changedBy?->nama ?? 'Sistem' }}
+                                    </span>
+                                </p>
+                            </div>
+                        </li>
+                    @endforeach
+                </ol>
+            @endif
+
+        </div>
+        {{-- ============================================================ --}}
+
     </div>
 @endsection

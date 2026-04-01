@@ -102,4 +102,9 @@ class Barang extends Model
     {
         return $this->belongsTo(Ruangan::class);
     }
+
+    public function kondisiHistory()
+    {
+        return $this->hasMany(KondisiBarangHistory::class);
+    }
 }

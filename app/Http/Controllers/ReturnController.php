@@ -8,6 +8,7 @@ use App\Models\TiketKerusakan;
 use App\Models\User;
 use App\Models\Waitlist;
 use App\Services\BmnParser;
+use App\Services\KondisiHistoryService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -80,13 +81,24 @@ class ReturnController extends Controller
                     'catatan_kondisi' => $data['deskripsi'] ?? null,
                 ]);
 
-                \App\Models\Barang::where('kode_barang', $kode_barang)
+                $barang = \App\Models\Barang::where('kode_barang', $kode_barang)
                     ->where('nup', $target_nup)
-                    ->update([
+                    ->first();
+
+                if ($barang) {
+                    $barang->update([
                         'ketersediaan' => 'tersedia',
-                        'kondisi_terakhir' => $kondisiKembali,
-                        'waktu_kembali' => $waktu_kembali
+                        'waktu_kembali' => $waktu_kembali,
                     ]);
+
+                    app(KondisiHistoryService::class)->record(
+                        $barang,
+                        $kondisiKembali,
+                        'return',
+                        $peminjaman->id,
+                        $data['deskripsi'] ?? null
+                    );
+                }
 
                 // Create damage ticket if item is damaged
                 if ($shouldCreateTicket) {

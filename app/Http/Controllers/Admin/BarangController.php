@@ -11,7 +11,9 @@ use App\Models\Kategori;
 use App\Models\Ruangan;
 use App\Models\User;
 use App\Services\BarangImportService;
+use App\Services\KondisiHistoryService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class BarangController extends Controller
 {
@@ -88,11 +90,15 @@ class BarangController extends Controller
     public function edit($id)
     {
         $barang = Barang::findOrFail($id);
+        $kondisiHistory = $barang->kondisiHistory()
+            ->with('changedBy:id,nama')
+            ->orderByDesc('created_at')
+            ->get();
         $users = $this->getUserOptions();
         $kategoriList = Kategori::orderBy('nama_kategori')->get();
         $ruanganList = Ruangan::orderBy('nama_ruangan')->get();
 
-        return view('admin.barang.edit', compact('barang', 'users', 'kategoriList', 'ruanganList'));
+        return view('admin.barang.edit', compact('barang', 'users', 'kategoriList', 'ruanganList', 'kondisiHistory'));
     }
 
     /**
@@ -106,13 +112,21 @@ class BarangController extends Controller
         $barang->update([
             'brand' => $data['brand'],
             'tipe' => $data['tipe'],
-            'kondisi_terakhir' => $data['kondisi'],
             'keterangan' => $data['keterangan'] ?? null,
             'ketersediaan' => $data['ketersediaan'],
             'pic_user_id' => $data['pic_user_id'] ?? null,
             'kategori_id' => $data['kategori_id'] ?? null,
             'ruangan_id' => $data['ruangan_id'] ?? null,
         ]);
+
+        app(KondisiHistoryService::class)->record(
+            $barang,
+            $data['kondisi'],
+            'manual',
+            null,
+            null,
+            Auth::id()
+        );
 
         $this->logAudit('update', 'barang', $barang->id, [
             'kode_barang' => $barang->kode_barang,

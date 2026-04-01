@@ -8,6 +8,7 @@ use App\Models\Barang;
 use App\Models\StockOpnameItem;
 use App\Models\StockOpnameSession;
 use App\Services\BmnParser;
+use App\Services\KondisiHistoryService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -193,6 +194,16 @@ class StockOpnameController extends Controller
             'scanned_by' => Auth::id(),
             'scanned_at' => Carbon::now('Asia/Jakarta'),
         ]);
+
+        if ($barang && $item->actual_kondisi) {
+            app(KondisiHistoryService::class)->record(
+                $barang,
+                $item->actual_kondisi,
+                'stock_opname',
+                $item->id,
+                null
+            );
+        }
 
         $this->logAudit('scan', 'stock_opname', $session->id, [
             'kode_barang' => $item->kode_barang,
