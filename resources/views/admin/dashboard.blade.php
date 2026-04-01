@@ -455,25 +455,32 @@
         }
     });
 
-    function updateChartColors() {
-        const isDark = document.documentElement.getAttribute('data-theme') === 'dark'
-            || document.documentElement.classList.contains('dark');
-        const gridColor = isDark ? 'rgba(148,163,184,0.12)' : 'rgba(148,163,184,0.25)';
-        const tickColor = isDark ? '#94A3B8' : '#64748B';
+    function refreshChartTheme() {
+        const dark = document.documentElement.classList.contains('dark');
+        const grid  = dark ? 'rgba(148,163,184,0.12)' : 'rgba(148,163,184,0.25)';
+        const ticks = dark ? '#94A3B8' : '#64748B';
 
-        [chartTrend, chartKondisi, chartStatus].forEach(chart => {
-            if (!chart) return;
-            chart.options.scales?.x && (chart.options.scales.x.grid.color = gridColor);
-            chart.options.scales?.x && (chart.options.scales.x.ticks.color = tickColor);
-            chart.options.scales?.y && (chart.options.scales.y.grid.color = gridColor);
-            chart.options.scales?.y && (chart.options.scales.y.ticks.color = tickColor);
-            chart.update('none'); // 'none' = no animation on color update
+        [chartTrend, chartStatus].forEach(c => {
+            if (!c) return;
+            c.options.scales.x.grid.color  = grid;
+            c.options.scales.x.ticks.color = ticks;
+            c.options.scales.y.grid.color  = grid;
+            c.options.scales.y.ticks.color = ticks;
+            c.update('none');
         });
+
+        if (chartKondisi) {
+            chartKondisi.options.plugins.legend.labels.color = ticks;
+            chartKondisi.data.datasets[0].borderColor = dark ? '#1e293b' : '#ffffff';
+            chartKondisi.update('none');
+        }
     }
 
-    // Watch for data-theme attribute changes on <html>
-    const observer = new MutationObserver(updateChartColors);
-    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme', 'class'] });
+    const _themeObserver = new MutationObserver(refreshChartTheme);
+    _themeObserver.observe(document.documentElement, {
+        attributes: true,
+        attributeFilter: ['class']
+    });
 })();
 </script>
 @endpush
