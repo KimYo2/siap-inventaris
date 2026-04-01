@@ -130,13 +130,6 @@
                             $isAdmin = ($user->role ?? '') === 'admin';
                             $label = $isAdmin ? 'Admin - ' . $displayName : $displayName;
                             $initial = mb_strtoupper(mb_substr($displayName, 0, 1));
-                            $unreadNotifCount = \App\Models\Notifikasi::where('user_id', $user->id)
-                                ->where('is_read', false)->count();
-                            $latestNotifs = \App\Models\Notifikasi::where('user_id', $user->id)
-                                ->where('is_read', false)
-                                ->orderByDesc('created_at')
-                                ->limit(5)
-                                ->get();
                         @endphp
 
                         {{-- Notification Bell --}}
