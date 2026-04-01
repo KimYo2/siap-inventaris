@@ -342,7 +342,7 @@
     const trendLabels = monthlyTrendData.map(d => monthNames[parseInt(d.bulan) - 1] + " '" + String(d.tahun).slice(2));
     const trendValues = monthlyTrendData.map(d => parseInt(d.total));
 
-    new Chart(document.getElementById('chartTrend'), {
+    const chartTrend = new Chart(document.getElementById('chartTrend'), {
         type: 'line',
         data: {
             labels: trendLabels,
@@ -384,7 +384,7 @@
     const kondisiValues = kondisiRaw.map(d => parseInt(d.total));
     const kondisiColors = kondisiRaw.map(d => kondisiColorMap[d.kondisi_terakhir] ?? '#94A3B8');
 
-    new Chart(document.getElementById('chartKondisi'), {
+    const chartKondisi = new Chart(document.getElementById('chartKondisi'), {
         type: 'doughnut',
         data: {
             labels: kondisiLabels,
@@ -431,7 +431,7 @@
     const statusValues = allStatuses.map(s => statusMapObj[s] ?? 0);
     const statusColors = allStatuses.map(s => statusColorMap[s] ?? '#94A3B8');
 
-    new Chart(document.getElementById('chartStatus'), {
+    const chartStatus = new Chart(document.getElementById('chartStatus'), {
         type: 'bar',
         data: {
             labels: statusLabels,
@@ -454,6 +454,26 @@
             }
         }
     });
+
+    function updateChartColors() {
+        const isDark = document.documentElement.getAttribute('data-theme') === 'dark'
+            || document.documentElement.classList.contains('dark');
+        const gridColor = isDark ? 'rgba(148,163,184,0.12)' : 'rgba(148,163,184,0.25)';
+        const tickColor = isDark ? '#94A3B8' : '#64748B';
+
+        [chartTrend, chartKondisi, chartStatus].forEach(chart => {
+            if (!chart) return;
+            chart.options.scales?.x && (chart.options.scales.x.grid.color = gridColor);
+            chart.options.scales?.x && (chart.options.scales.x.ticks.color = tickColor);
+            chart.options.scales?.y && (chart.options.scales.y.grid.color = gridColor);
+            chart.options.scales?.y && (chart.options.scales.y.ticks.color = tickColor);
+            chart.update('none'); // 'none' = no animation on color update
+        });
+    }
+
+    // Watch for data-theme attribute changes on <html>
+    const observer = new MutationObserver(updateChartColors);
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme', 'class'] });
 })();
 </script>
 @endpush
