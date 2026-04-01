@@ -101,12 +101,21 @@ class BarangSeeder extends Seeder
         ];
 
         foreach ($barang as $item) {
+            // Normalize kondisi values from legacy format
+            $kondisiMap = [
+                'Baik' => 'baik',
+                'Rusak Ringan' => 'rusak_ringan',
+                'Rusak Berat' => 'rusak_berat',
+                '' => 'baik',
+            ];
+            $kondisi = $kondisiMap[$item[4]] ?? 'baik';
+
             DB::table('barang')->insert([
                 'kode_barang' => $item[0],
                 'nup' => $item[1],
                 'brand' => $item[2],
                 'tipe' => $item[3],
-                'kondisi_terakhir' => $item[4],
+                'kondisi_terakhir' => $kondisi,
                 'ketersediaan' => $item[5],
                 'created_at' => now(),
                 'updated_at' => now(),

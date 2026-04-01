@@ -92,7 +92,7 @@ class BarangController extends Controller
     {
         $barang = Barang::findOrFail($id);
         $kondisiHistory = $barang->kondisiHistory()
-            ->with('changedBy:id,nama')
+            ->with('changedBy:id,name')
             ->orderByDesc('created_at')
             ->get();
         $users = $this->getUserOptions();
@@ -178,8 +178,8 @@ class BarangController extends Controller
 
     private function getUserOptions()
     {
-        return User::select(['id', 'nama', 'nip'])
-            ->orderBy('nama')
+        return User::select(['id', 'name', 'nip'])
+            ->orderBy('name')
             ->get();
     }
 

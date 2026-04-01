@@ -125,7 +125,7 @@ class BarangController extends Controller
                     'kode_barang' => $kode_barang,
                     'nup' => $nup,
                     'nip_peminjam' => $user->nip,
-                    'nama_peminjam' => $user->nama,
+                    'nama_peminjam' => $user->name,
                     'waktu_pengajuan' => $waktu_pengajuan,
                     'waktu_pinjam' => null,
                     'status' => 'menunggu',

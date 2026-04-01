@@ -16,7 +16,8 @@ class UserSeeder extends Seeder
         DB::table('users')->insert([
             [
                 'nip' => '198001012006041001',
-                'nama' => 'Admin BPS',
+                'name' => 'Admin BPS',
+                'email' => 'admin@bps.go.id',
                 'password' => Hash::make('password123'),
                 'role' => 'admin',
                 'created_at' => now(),
@@ -24,7 +25,8 @@ class UserSeeder extends Seeder
             ],
             [
                 'nip' => '199001012015041001',
-                'nama' => 'Budi Santoso',
+                'name' => 'Budi Santoso',
+                'email' => 'budi.santoso@bps.go.id',
                 'password' => Hash::make('password123'),
                 'role' => 'user',
                 'created_at' => now(),
@@ -32,7 +34,8 @@ class UserSeeder extends Seeder
             ],
             [
                 'nip' => '199505012018041001',
-                'nama' => 'Siti Nurhaliza',
+                'name' => 'Siti Nurhaliza',
+                'email' => 'siti.nurhaliza@bps.go.id',
                 'password' => Hash::make('password123'),
                 'role' => 'user',
                 'created_at' => now(),
@@ -40,7 +43,8 @@ class UserSeeder extends Seeder
             ],
             [
                 'nip' => '199808012020041001',
-                'nama' => 'Ahmad Wijaya',
+                'name' => 'Ahmad Wijaya',
+                'email' => 'ahmad.wijaya@bps.go.id',
                 'password' => Hash::make('password123'),
                 'role' => 'user',
                 'created_at' => now(),

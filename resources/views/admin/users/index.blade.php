@@ -86,7 +86,7 @@
                                     {{ $user->nip }}
                                 </td>
                                 <td class="px-6 py-4 text-sm text-slate-900 dark:text-white font-medium">
-                                    {{ $user->nama }}
+                                    {{ $user->name }}
                                 </td>
                                 <td class="px-6 py-4 text-sm text-slate-600 dark:text-slate-400">
                                     {{ $user->email }}
@@ -118,7 +118,7 @@
                                         @if($user->id !== Auth::id())
                                             @if($user->is_active)
                                                 <form action="{{ route('admin.users.destroy', $user->id) }}" method="POST"
-                                                    onsubmit="return confirm('Nonaktifkan user {{ $user->nama }}?')">
+                                                    onsubmit="return confirm('Nonaktifkan user {{ $user->name }}?')">
                                                     @csrf
                                                     @method('DELETE')
                                                     <button type="submit"

@@ -19,11 +19,11 @@ class UserController extends Controller
         $users = User::query()
             ->when($request->search, function ($query, $search) {
                 $query->where(function ($q) use ($search) {
-                    $q->where('nama', 'like', "%{$search}%")
+                    $q->where('name', 'like', "%{$search}%")
                       ->orWhere('nip', 'like', "%{$search}%");
                 });
             })
-            ->orderBy('nama')
+            ->orderBy('name')
             ->paginate(15)
             ->withQueryString();
 
@@ -41,7 +41,7 @@ class UserController extends Controller
 
         $user = User::create([
             'nip' => $data['nip'],
-            'nama' => $data['nama'],
+            'name' => $data['name'],
             'email' => $data['email'],
             'password' => $data['password'],
             'role' => $data['role'],
@@ -68,7 +68,7 @@ class UserController extends Controller
 
         $updateData = [
             'nip' => $data['nip'],
-            'nama' => $data['nama'],
+            'name' => $data['name'],
             'email' => $data['email'],
             'role' => $data['role'],
         ];

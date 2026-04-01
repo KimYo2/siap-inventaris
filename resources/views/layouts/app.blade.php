@@ -111,7 +111,7 @@
                     @auth
                         @php
                             $user = Auth::user();
-                            $displayName = $user->nama ?? $user->name ?? $user->nip ?? 'User';
+                            $displayName = $user->name ?? $user->nip ?? 'User';
                             $isAdmin = ($user->role ?? '') === 'admin';
                             $label = $isAdmin ? 'Admin - ' . $displayName : $displayName;
                             $initial = mb_strtoupper(mb_substr($displayName, 0, 1));

@@ -26,13 +26,13 @@
                 </div>
 
                 <div>
-                    <label for="nama"
+                    <label for="name"
                         class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5 transition-colors">Nama
                         Lengkap</label>
-                    <input type="text" name="nama" id="nama" value="{{ old('nama') }}" required
+                    <input type="text" name="name" id="name" value="{{ old('name') }}" required
                         class="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-slate-900 dark:text-white transition"
                         placeholder="Nama lengkap pegawai">
-                    @error('nama')
+                    @error('name')
                         <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
                     @enderror
                 </div>

@@ -109,7 +109,7 @@ class ReturnController extends Controller
                 if ($shouldCreateTicket) {
                     $ticket = TiketKerusakan::create([
                         'nomor_bmn' => $kode_barang . '-' . $target_nup,
-                        'pelapor' => $user->nama ?? $user->name ?? 'System',
+                        'pelapor' => $user->name ?? 'System',
                         'jenis_kerusakan' => $data['jenis_kerusakan'] ?? 'ringan',
                         'deskripsi' => $data['deskripsi'] ?? '-',
                         'status' => 'open'
@@ -133,7 +133,7 @@ class ReturnController extends Controller
                             'kode_barang' => $kode_barang,
                             'nup' => $target_nup,
                             'nip_peminjam' => $waitUser->nip,
-                            'nama_peminjam' => $waitUser->nama,
+                            'nama_peminjam' => $waitUser->name,
                             'waktu_pengajuan' => $waktu_kembali,
                             'waktu_pinjam' => null,
                             'status' => 'menunggu',

@@ -66,7 +66,7 @@
                         @foreach($users as $user)
                             <option value="{{ $user->id }}"
                                 {{ old('pic_user_id', $barang->pic_user_id) == $user->id ? 'selected' : '' }}>
-                                {{ $user->nama }} ({{ $user->nip }})
+                                {{ $user->name }} ({{ $user->nip }})
                             </option>
                         @endforeach
                     </select>
