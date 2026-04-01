@@ -19,16 +19,29 @@ class HistoriController extends Controller
         $query = HistoriPeminjaman::query()
             ->filter($request->only(['status', 'search']));
 
+        if ($request->filled('date_from')) {
+            $query->where('waktu_pinjam', '>=', $request->date_from . ' 00:00:00');
+        }
+
+        if ($request->filled('date_to')) {
+            $query->where('waktu_pinjam', '<=', $request->date_to . ' 23:59:59');
+        }
+
         $histori = $query->orderBy('waktu_pinjam', 'desc')
             ->paginate(15)
             ->withQueryString();
 
-        return view('admin.histori.index', compact('histori'));
+        $dateFrom = $request->input('date_from');
+        $dateTo   = $request->input('date_to');
+
+        return view('admin.histori.index', compact('histori', 'dateFrom', 'dateTo'));
     }
 
     public function export(Request $request)
     {
-        $filters = $request->only(['status', 'search']);
+        $filters   = $request->only(['status', 'search']);
+        $dateFrom  = $request->input('date_from');
+        $dateTo    = $request->input('date_to');
 
         $query = HistoriPeminjaman::query()
             ->select([
@@ -48,11 +61,23 @@ class HistoriController extends Controller
             ])
             ->filter($filters);
 
-        $filename = 'histori_peminjaman_' . Carbon::now('Asia/Jakarta')->format('Ymd_His') . '.csv';
+        if ($dateFrom) {
+            $query->where('waktu_pinjam', '>=', $dateFrom . ' 00:00:00');
+        }
+
+        if ($dateTo) {
+            $query->where('waktu_pinjam', '<=', $dateTo . ' 23:59:59');
+        }
+
+        $fromPart = $dateFrom ? str_replace('-', '', $dateFrom) : 'awal';
+        $toPart   = $dateTo   ? str_replace('-', '', $dateTo)   : 'sekarang';
+        $filename = 'histori_peminjaman_' . $fromPart . '_to_' . $toPart . '_' . Carbon::now('Asia/Jakarta')->format('Ymd_His') . '.csv';
 
         $this->logAudit('export', 'histori_peminjaman', null, [
-            'filters' => array_filter($filters, fn ($value) => $value !== null && $value !== ''),
-            'format' => 'csv',
+            'filters'   => array_filter($filters, fn ($value) => $value !== null && $value !== ''),
+            'date_from' => $dateFrom,
+            'date_to'   => $dateTo,
+            'format'    => 'csv',
         ]);
 
         return response()->streamDownload(function () use ($query) {

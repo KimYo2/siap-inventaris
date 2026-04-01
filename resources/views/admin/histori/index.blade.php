@@ -17,7 +17,7 @@
             </div>
 
             <!-- Optional: Export Button Placeholder (Legacy had it) -->
-            <a href="{{ route('admin.histori.export', request()->query()) }}"
+            <a href="{{ route('admin.histori.export', array_filter(array_merge(request()->query(), ['date_from' => $dateFrom ?? null, 'date_to' => $dateTo ?? null]), fn($v) => $v !== null && $v !== '')) }}"
                 class="bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-medium py-2 px-4 rounded-lg transition inline-flex items-center gap-2 shadow-sm text-sm">
                 <svg class="w-4 h-4 text-green-600 dark:text-green-400" fill="none" stroke="currentColor"
                     viewBox="0 0 24 24">
@@ -31,7 +31,7 @@
         <!-- Filters -->
         <div
             class="bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 shadow-sm p-5 mb-6 transition-colors">
-            <form action="{{ route('admin.histori.index') }}" method="GET" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <form action="{{ route('admin.histori.index') }}" method="GET" class="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <div>
                     <label
                         class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5 transition-colors">Filter
@@ -48,23 +48,53 @@
                         <option value="ditolak" {{ request('status') == 'ditolak' ? 'selected' : '' }}>Ditolak</option>
                     </select>
                 </div>
-                <div class="flex items-end">
-                    <!-- Search placeholder if needed or just empty space usage -->
-                    <div class="w-full">
-                        <label
-                            class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5 transition-colors">Pencarian</label>
-                        <div class="flex gap-2">
-                            <input type="text" name="search" value="{{ request('search') }}"
-                                placeholder="Cari NUP, Nama Peminjam..."
-                                class="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-slate-900 dark:text-white transition placeholder-slate-400">
-                            <button type="submit"
-                                class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2.5 px-5 rounded-lg transition shadow-sm">
-                                Cari
-                            </button>
-                        </div>
+                <div>
+                    <label
+                        class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5 transition-colors">Tanggal
+                        Dari</label>
+                    <input type="date" name="date_from" value="{{ $dateFrom ?? request('date_from') }}"
+                        class="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-slate-900 dark:text-white transition">
+                </div>
+                <div>
+                    <label
+                        class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5 transition-colors">Tanggal
+                        Sampai</label>
+                    <input type="date" name="date_to" value="{{ $dateTo ?? request('date_to') }}"
+                        class="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-slate-900 dark:text-white transition">
+                </div>
+                <div>
+                    <label
+                        class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5 transition-colors">Pencarian</label>
+                    <div class="flex gap-2">
+                        <input type="text" name="search" value="{{ request('search') }}"
+                            placeholder="Cari NUP, Nama Peminjam..."
+                            class="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-slate-900 dark:text-white transition placeholder-slate-400">
+                        <button type="submit"
+                            class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2.5 px-5 rounded-lg transition shadow-sm">
+                            Cari
+                        </button>
                     </div>
                 </div>
             </form>
+
+            {{-- Active date range badge --}}
+            @if(!empty($dateFrom) || !empty($dateTo))
+                <div class="mt-3 flex items-center gap-2">
+                    <span class="text-xs text-slate-500 dark:text-slate-400">Rentang aktif:</span>
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-700">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                        </svg>
+                        {{ $dateFrom ? \Carbon\Carbon::parse($dateFrom)->format('d M Y') : '…' }}
+                        –
+                        {{ $dateTo ? \Carbon\Carbon::parse($dateTo)->format('d M Y') : 'Sekarang' }}
+                    </span>
+                    <a href="{{ route('admin.histori.index', array_filter(request()->except(['date_from', 'date_to']), fn($v) => $v !== null && $v !== '')) }}"
+                        class="text-xs text-slate-500 dark:text-slate-400 hover:text-red-500 dark:hover:text-red-400 transition"
+                        title="Hapus filter tanggal">&times; Hapus</a>
+                </div>
+            @endif
         </div>
 
         <!-- Histori List -->
@@ -113,7 +143,7 @@
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <span
-                                        class="px-2.5 py-0.5 inline-flex text-xs leading-5 font-semibold rounded-md border 
+                                        class="px-2.5 py-0.5 inline-flex text-xs leading-5 font-semibold rounded-md border
                                             {{ $item->status_badge_class }}">
                                         {{ $item->status_label }}
                                     </span>
