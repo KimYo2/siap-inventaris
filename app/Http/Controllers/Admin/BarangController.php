@@ -12,6 +12,7 @@ use App\Models\Ruangan;
 use App\Models\User;
 use App\Services\BarangImportService;
 use App\Services\KondisiHistoryService;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -25,7 +26,7 @@ class BarangController extends Controller
     {
         $barang = Barang::query()
             ->with(['pic', 'kategori', 'ruangan'])
-            ->filter($request->only(['ketersediaan', 'kategori_id', 'ruangan_id', 'search']))
+            ->filter($request->only(['ketersediaan', 'kategori_id', 'ruangan_id', 'search', 'status_barang']))
             ->paginate(10)
             ->withQueryString();
 
@@ -180,5 +181,48 @@ class BarangController extends Controller
         return User::select(['id', 'nama', 'nip'])
             ->orderBy('nama')
             ->get();
+    }
+
+    public function updateStatus(Request $request, $id)
+    {
+        $request->validate([
+            'status_barang'  => 'required|in:aktif,rusak_total,hilang,dihapuskan',
+            'catatan_status' => 'nullable|string|max:2000',
+        ]);
+
+        $barang = Barang::findOrFail($id);
+        $now    = Carbon::now('Asia/Jakarta');
+
+        $ketersediaan = $barang->ketersediaan;
+        if (in_array($request->status_barang, ['rusak_total', 'dihapuskan'])) {
+            $ketersediaan = 'reparasi';
+        } elseif ($request->status_barang === 'hilang') {
+            $ketersediaan = 'hilang';
+        } elseif ($request->status_barang === 'aktif') {
+            $ketersediaan = 'tersedia';
+        }
+
+        $barang->update([
+            'status_barang'      => $request->status_barang,
+            'catatan_status'     => $request->catatan_status,
+            'status_diupdate_at' => $now,
+            'status_diupdate_by' => Auth::id(),
+            'ketersediaan'       => $ketersediaan,
+        ]);
+
+        $this->logAudit('update_status', 'barang', $barang->id, [
+            'kode_barang'  => $barang->kode_barang,
+            'nup'          => $barang->nup,
+            'status_barang'=> $request->status_barang,
+        ]);
+
+        $statusLabel = [
+            'aktif'       => 'Aktif',
+            'rusak_total' => 'Rusak Total',
+            'hilang'      => 'Hilang',
+            'dihapuskan'  => 'Dihapuskan',
+        ][$request->status_barang];
+
+        return redirect()->back()->with('success', "Status barang berhasil diubah menjadi: {$statusLabel}.");
     }
 }

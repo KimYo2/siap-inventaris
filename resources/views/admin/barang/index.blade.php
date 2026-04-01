@@ -51,7 +51,7 @@
         <!-- Filters -->
         <div
             class="bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 shadow-sm p-5 mb-6 transition-colors">
-            <form action="{{ route('admin.barang.index') }}" method="GET" class="grid grid-cols-1 md:grid-cols-5 gap-4">
+            <form action="{{ route('admin.barang.index') }}" method="GET" class="grid grid-cols-1 md:grid-cols-6 gap-4">
                 <div>
                     <label
                         class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5 transition-colors">Filter
@@ -63,6 +63,18 @@
                         </option>
                         <option value="dipinjam" {{ request('ketersediaan') == 'dipinjam' ? 'selected' : '' }}>Dipinjam
                         </option>
+                    </select>
+                </div>
+                <div>
+                    <label
+                        class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5 transition-colors">Status Barang</label>
+                    <select name="status_barang" onchange="this.form.submit()"
+                        class="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-slate-900 dark:text-white transition">
+                        <option value="">Semua</option>
+                        <option value="aktif" {{ request('status_barang') == 'aktif' ? 'selected' : '' }}>Aktif</option>
+                        <option value="rusak_total" {{ request('status_barang') == 'rusak_total' ? 'selected' : '' }}>Rusak Total</option>
+                        <option value="hilang" {{ request('status_barang') == 'hilang' ? 'selected' : '' }}>Hilang</option>
+                        <option value="dihapuskan" {{ request('status_barang') == 'dihapuskan' ? 'selected' : '' }}>Dihapuskan</option>
                     </select>
                 </div>
                 <div>
@@ -130,7 +142,8 @@
                     <tbody
                         class="bg-white dark:bg-slate-800 divide-y divide-slate-200 dark:divide-slate-700 text-sm transition-colors">
                         @forelse($barang as $item)
-                                        <tr class="hover:bg-slate-50 dark:hover:bg-slate-700/50 transition duration-150">
+                                        @php $isInactive = !$item->isAktif(); @endphp
+                                        <tr class="hover:bg-slate-50 dark:hover:bg-slate-700/50 transition duration-150 {{ $isInactive ? 'opacity-60' : '' }}">
                                             <td class="px-3 py-4 text-center w-10">
                                                 <input type="checkbox" name="ids[]" value="{{ $item->id }}" form="bulk-qr-form"
                                                     class="bulk-checkbox rounded border-slate-300 dark:border-slate-600 text-blue-600 focus:ring-blue-500">
@@ -163,6 +176,11 @@
                                                                                                                     {{ $item->ketersediaan === 'tersedia' ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300' : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300' }}">
                                                     {{ ucfirst($item->ketersediaan) }}
                                                 </span>
+                                                @if(!$item->isAktif())
+                                                    <span class="mt-1 px-2 py-0.5 inline-flex text-xs leading-5 font-semibold rounded-md {{ $item->status_barang_badge_class }}">
+                                                        {{ $item->status_barang_label }}
+                                                    </span>
+                                                @endif
                                             </td>
                                             <td class="px-6 py-4 whitespace-nowrap text-slate-500 dark:text-slate-400 text-xs">
                                                 @if(!empty($item->peminjam_terakhir))
@@ -191,7 +209,7 @@
                                                 {{ $item->pic ? $item->pic->nama : '-' }}
                                             </td>
                                             <td class="px-6 py-4 whitespace-nowrap text-center">
-                                                <div class="flex items-center justify-center gap-2">
+                                                <div class="flex items-center justify-center gap-2" x-data="{ openStatus: false }">
                                                     <a href="{{ route('admin.barang.qr-label', $item->id) }}" target="_blank"
                                                         title="Cetak QR"
                                                         class="text-emerald-600 hover:text-emerald-900 dark:text-emerald-400 dark:hover:text-emerald-300 p-1 hover:bg-emerald-50 dark:hover:bg-emerald-900/30 rounded transition">
@@ -210,6 +228,15 @@
                                                         </svg>
                                                     </a>
 
+                                                    {{-- Quick Status Change --}}
+                                                    <button @click="openStatus = true" title="Ubah Status Barang"
+                                                        class="text-amber-600 hover:text-amber-900 dark:text-amber-400 dark:hover:text-amber-300 p-1 hover:bg-amber-50 dark:hover:bg-amber-900/30 rounded transition">
+                                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                                                        </svg>
+                                                    </button>
+
                                                     <form action="{{ route('admin.barang.destroy', $item->id) }}" method="POST"
                                                         onsubmit="return confirm('Apakah Anda yakin ingin menghapus barang ini?');"
                                                         class="inline">
@@ -224,6 +251,61 @@
                                                             </svg>
                                                         </button>
                                                     </form>
+
+                                                    {{-- Status Change Modal --}}
+                                                    <div x-show="openStatus"
+                                                        class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50"
+                                                        style="display: none;">
+                                                        <div class="bg-white dark:bg-slate-800 rounded-lg shadow-xl max-w-md w-full p-6"
+                                                            @click.away="openStatus = false">
+                                                            <div class="flex items-center gap-3 mb-4">
+                                                                <div class="w-10 h-10 rounded-full bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center shrink-0">
+                                                                    <svg class="w-5 h-5 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                                            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                                                                    </svg>
+                                                                </div>
+                                                                <div>
+                                                                    <h3 class="text-base font-bold dark:text-white">Ubah Status Barang</h3>
+                                                                    <p class="text-xs text-slate-500 dark:text-slate-400">{{ $item->kode_barang }}-{{ sprintf('%03d', $item->nup) }} &mdash; {{ $item->brand }} {{ $item->tipe }}</p>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="mb-3 flex items-center gap-2">
+                                                                <span class="text-xs text-slate-500 dark:text-slate-400">Status saat ini:</span>
+                                                                <span class="inline-flex text-xs px-2 py-0.5 rounded font-semibold {{ $item->status_barang_badge_class }}">{{ $item->status_barang_label }}</span>
+                                                            </div>
+
+                                                            <form action="{{ route('admin.barang.update-status', $item->id) }}" method="POST" class="space-y-4">
+                                                                @csrf
+                                                                @method('PUT')
+
+                                                                <div>
+                                                                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Status Baru <span class="text-red-500">*</span></label>
+                                                                    <select name="status_barang" required
+                                                                        class="w-full bg-slate-50 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 text-slate-900 dark:text-white rounded-lg p-2.5 text-sm">
+                                                                        <option value="aktif" {{ ($item->status_barang ?? 'aktif') === 'aktif' ? 'selected' : '' }}>✅ Aktif</option>
+                                                                        <option value="rusak_total" {{ $item->status_barang === 'rusak_total' ? 'selected' : '' }}>🔴 Rusak Total</option>
+                                                                        <option value="hilang" {{ $item->status_barang === 'hilang' ? 'selected' : '' }}>⬛ Hilang</option>
+                                                                        <option value="dihapuskan" {{ $item->status_barang === 'dihapuskan' ? 'selected' : '' }}>⚫ Dihapuskan</option>
+                                                                    </select>
+                                                                </div>
+
+                                                                <div>
+                                                                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Catatan</label>
+                                                                    <textarea name="catatan_status" rows="2" placeholder="Alasan perubahan status..."
+                                                                        class="w-full bg-slate-50 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 text-slate-900 dark:text-white rounded-lg p-2.5 text-sm">{{ $item->catatan_status }}</textarea>
+                                                                </div>
+
+                                                                <div class="flex justify-end gap-2">
+                                                                    <button type="button" @click="openStatus = false"
+                                                                        class="px-4 py-2 text-slate-500 hover:text-slate-700 dark:text-slate-400 text-sm">Batal</button>
+                                                                    <button type="submit"
+                                                                        class="px-5 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-sm font-medium transition">Simpan</button>
+                                                                </div>
+                                                            </form>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </td>
                                         </tr>

@@ -10,7 +10,7 @@
 
         <div class="mb-6">
             <form action="{{ route('admin.tiket.index') }}" method="GET"
-                class="grid grid-cols-1 md:grid-cols-4 gap-3 items-end">
+                class="grid grid-cols-1 md:grid-cols-5 gap-3 items-end">
                 <div>
                     <label class="block text-xs text-slate-500 dark:text-slate-400 mb-1">Status</label>
                     <select name="status"
@@ -44,6 +44,18 @@
                     </select>
                 </div>
                 <div>
+                    <label class="block text-xs text-slate-500 dark:text-slate-400 mb-1">Resolusi</label>
+                    <select name="resolusi"
+                        class="w-full bg-slate-50 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 text-slate-900 dark:text-white rounded-lg p-2.5 text-sm">
+                        <option value="">Semua</option>
+                        <option value="unresolved" {{ request('resolusi') == 'unresolved' ? 'selected' : '' }}>Belum Diselesaikan</option>
+                        <option value="diperbaiki" {{ request('resolusi') == 'diperbaiki' ? 'selected' : '' }}>Diperbaiki</option>
+                        <option value="dihapuskan" {{ request('resolusi') == 'dihapuskan' ? 'selected' : '' }}>Rusak Total</option>
+                        <option value="hilang" {{ request('resolusi') == 'hilang' ? 'selected' : '' }}>Hilang</option>
+                        <option value="diabaikan" {{ request('resolusi') == 'diabaikan' ? 'selected' : '' }}>Diabaikan</option>
+                    </select>
+                </div>
+                <div>
                     <button type="submit"
                         class="w-full text-white bg-blue-700 hover:bg-blue-800 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-blue-600 dark:hover:bg-blue-700">
                         Terapkan
@@ -59,7 +71,7 @@
             </div>
         @endif
 
-        @if($errors->has('status') || $errors->has('priority') || $errors->has('assigned_to') || $errors->has('target_selesai_at'))
+        @if($errors->has('status') || $errors->has('priority') || $errors->has('assigned_to') || $errors->has('target_selesai_at') || $errors->has('resolusi'))
             <div class="p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50 dark:bg-red-900/20 dark:text-red-300">
                 {{ $errors->first() }}
             </div>
@@ -77,6 +89,7 @@
                         <th class="px-6 py-3 text-left">Assignee</th>
                         <th class="px-6 py-3 text-left">Target</th>
                         <th class="px-6 py-3 text-left">Status</th>
+                        <th class="px-6 py-3 text-left">Resolusi</th>
                         <th class="px-6 py-3 text-left">Catatan</th>
                         <th class="px-6 py-3 text-left">Aksi</th>
                     </tr>
@@ -124,14 +137,36 @@
                                     {{ ucfirst($ticket->status) }}
                                 </span>
                             </td>
+                            <td class="px-6 py-4">
+                                @if($ticket->resolusi)
+                                    <span class="{{ $ticket->resolusi_badge_class }} text-xs px-2 py-1 rounded font-medium">
+                                        {{ $ticket->resolusi_label }}
+                                    </span>
+                                    @if($ticket->diselesaikan_at)
+                                        <div class="text-[11px] text-slate-400 dark:text-slate-500 mt-1">
+                                            {{ $ticket->diselesaikan_at->format('d/m/Y H:i') }}
+                                        </div>
+                                    @endif
+                                @else
+                                    <span class="text-xs text-slate-400 dark:text-slate-500">—</span>
+                                @endif
+                            </td>
                             <td class="px-6 py-4 max-w-xs">
                                 <div class="truncate">{{ $ticket->admin_notes ? Str::limit($ticket->admin_notes, 50) : '-' }}</div>
                             </td>
                             <td class="px-6 py-4">
-                                <div x-data="{ open: false }">
-                                    <button @click="open = true"
-                                        class="font-medium text-blue-600 dark:text-blue-500 hover:underline">Update</button>
+                                <div x-data="{ open: false, openResolve: false }">
+                                    <div class="flex items-center gap-2">
+                                        <button @click="open = true"
+                                            class="font-medium text-blue-600 dark:text-blue-500 hover:underline text-sm">Update</button>
+                                        @if(!$ticket->resolusi)
+                                            <span class="text-slate-300 dark:text-slate-600">|</span>
+                                            <button @click="openResolve = true"
+                                                class="font-medium text-orange-600 dark:text-orange-400 hover:underline text-sm">Selesaikan</button>
+                                        @endif
+                                    </div>
 
+                                    {{-- Update Modal --}}
                                     <div x-show="open"
                                         class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50"
                                         style="display: none;">
@@ -198,6 +233,67 @@
                                             </form>
                                         </div>
                                     </div>
+
+                                    {{-- Resolve Modal --}}
+                                    @if(!$ticket->resolusi)
+                                    <div x-show="openResolve"
+                                        class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50"
+                                        style="display: none;">
+                                        <div class="bg-white dark:bg-slate-800 rounded-lg shadow-xl max-w-lg w-full p-6"
+                                            @click.away="openResolve = false">
+                                            <div class="flex items-center gap-3 mb-4">
+                                                <div class="w-10 h-10 rounded-full bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center shrink-0">
+                                                    <svg class="w-5 h-5 text-orange-600 dark:text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                                    </svg>
+                                                </div>
+                                                <div>
+                                                    <h3 class="text-base font-bold dark:text-white">Selesaikan Tiket</h3>
+                                                    <p class="text-xs text-slate-500 dark:text-slate-400">{{ $ticket->nomor_bmn }} &mdash; {{ $ticket->pelapor }}</p>
+                                                </div>
+                                            </div>
+
+                                            <div class="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-3 mb-4">
+                                                <p class="text-xs text-amber-700 dark:text-amber-300">
+                                                    <strong>Perhatian:</strong> Memilih resolusi <em>Rusak Total</em> atau <em>Hilang</em> akan mengubah status barang secara permanen dan mencegah peminjaman.
+                                                </p>
+                                            </div>
+
+                                            <form action="{{ route('admin.tiket.resolve', $ticket->id) }}" method="POST"
+                                                class="space-y-4">
+                                                @csrf
+                                                @method('PUT')
+
+                                                <div>
+                                                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Resolusi <span class="text-red-500">*</span></label>
+                                                    <select name="resolusi" required
+                                                        class="w-full bg-slate-50 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 text-slate-900 dark:text-white rounded-lg p-2.5">
+                                                        <option value="">-- Pilih Resolusi --</option>
+                                                        <option value="diperbaiki">✅ Diperbaiki — barang kembali aktif, kondisi baik</option>
+                                                        <option value="dihapuskan">🔴 Rusak Total — barang tidak dapat digunakan lagi</option>
+                                                        <option value="hilang">⬛ Hilang — barang tidak ditemukan</option>
+                                                        <option value="diabaikan">⚠️ Diabaikan — tidak ada tindak lanjut</option>
+                                                    </select>
+                                                </div>
+
+                                                <div>
+                                                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Catatan Resolusi</label>
+                                                    <textarea name="catatan_resolusi" rows="3" placeholder="Keterangan tambahan mengenai penyelesaian tiket ini..."
+                                                        class="w-full bg-slate-50 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 text-slate-900 dark:text-white rounded-lg p-2.5 text-sm"></textarea>
+                                                </div>
+
+                                                <div class="flex justify-end gap-2 pt-2">
+                                                    <button type="button" @click="openResolve = false"
+                                                        class="px-4 py-2 text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 text-sm">Batal</button>
+                                                    <button type="submit"
+                                                        class="px-5 py-2 bg-orange-600 hover:bg-orange-700 text-white rounded-lg text-sm font-medium transition">Simpan Resolusi</button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                    @endif
+
                                 </div>
                             </td>
                         </tr>

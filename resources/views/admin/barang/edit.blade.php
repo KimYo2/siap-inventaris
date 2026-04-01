@@ -275,5 +275,114 @@
         </div>
         {{-- ============================================================ --}}
 
+        {{-- ===================== STATUS BARANG ======================= --}}
+        <div class="mt-8 bg-white dark:bg-slate-800 rounded-lg border border-red-200 dark:border-red-900/50 shadow-sm p-6 sm:p-8 transition-colors">
+
+            <div class="flex items-center gap-2 mb-2">
+                <svg class="w-5 h-5 text-red-500 dark:text-red-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+                <h2 class="text-base font-bold text-red-700 dark:text-red-400">Status Barang</h2>
+            </div>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mb-5">
+                Mengubah status ke <strong>Rusak Total</strong>, <strong>Hilang</strong>, atau <strong>Dihapuskan</strong>
+                akan mencegah barang ini dipinjam dan mengubah ketersediaannya secara otomatis.
+            </p>
+
+            <div class="mb-5 flex flex-wrap items-center gap-3">
+                <span class="text-sm text-slate-600 dark:text-slate-400">Status saat ini:</span>
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold {{ $barang->status_barang_badge_class }}">
+                    {{ $barang->status_barang_label }}
+                </span>
+                @if($barang->catatan_status)
+                    <span class="text-xs text-slate-500 dark:text-slate-400 italic">&ldquo;{{ $barang->catatan_status }}&rdquo;</span>
+                @endif
+                @if($barang->status_diupdate_at)
+                    <span class="text-xs text-slate-400 dark:text-slate-500">
+                        Diperbarui {{ $barang->status_diupdate_at->timezone('Asia/Jakarta')->format('d M Y, H:i') }}
+                        @if($barang->statusUpdater)
+                            oleh <span class="font-medium">{{ $barang->statusUpdater->nama }}</span>
+                        @endif
+                    </span>
+                @endif
+            </div>
+
+            {{-- Quick action buttons --}}
+            <div class="flex flex-wrap gap-3 mb-6">
+                @if($barang->isAktif())
+                    <form action="{{ route('admin.barang.update-status', $barang->id) }}" method="POST"
+                        onsubmit="return confirm('Tandai barang ini sebagai HILANG? Ketersediaan akan diubah otomatis dan barang tidak dapat dipinjam.');">
+                        @csrf @method('PUT')
+                        <input type="hidden" name="status_barang" value="hilang">
+                        <button type="submit"
+                            class="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-slate-400 bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:border-slate-600 dark:hover:bg-slate-600 text-slate-800 dark:text-slate-200 text-sm font-medium transition">
+                            <svg class="w-4 h-4 text-slate-500" fill="currentColor" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/></svg>
+                            Tandai Hilang
+                        </button>
+                    </form>
+
+                    <form action="{{ route('admin.barang.update-status', $barang->id) }}" method="POST"
+                        onsubmit="return confirm('Tandai barang ini sebagai RUSAK TOTAL? Tindakan ini bersifat administratif permanen.');">
+                        @csrf @method('PUT')
+                        <input type="hidden" name="status_barang" value="rusak_total">
+                        <button type="submit"
+                            class="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-red-400 bg-red-50 hover:bg-red-100 dark:bg-red-900/30 dark:border-red-700 dark:hover:bg-red-900/50 text-red-700 dark:text-red-300 text-sm font-medium transition">
+                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><circle cx="10" cy="10" r="8" fill="currentColor" opacity="0.2"/><path d="M10 3a7 7 0 100 14A7 7 0 0010 3zm0 2a5 5 0 110 10A5 5 0 0110 5zm-1 3v4h2V8H9zm0 5v2h2v-2H9z" fill="currentColor"/></svg>
+                            Tandai Rusak Total
+                        </button>
+                    </form>
+                @else
+                    <form action="{{ route('admin.barang.update-status', $barang->id) }}" method="POST"
+                        onsubmit="return confirm('Kembalikan status barang ini menjadi AKTIF?');">
+                        @csrf @method('PUT')
+                        <input type="hidden" name="status_barang" value="aktif">
+                        <button type="submit"
+                            class="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-green-400 bg-green-50 hover:bg-green-100 dark:bg-green-900/30 dark:border-green-700 dark:hover:bg-green-900/50 text-green-700 dark:text-green-300 text-sm font-medium transition">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            Kembalikan ke Aktif
+                        </button>
+                    </form>
+                @endif
+            </div>
+
+            {{-- Full status change form --}}
+            <form action="{{ route('admin.barang.update-status', $barang->id) }}" method="POST" class="border-t border-slate-200 dark:border-slate-700 pt-5 space-y-4">
+                @csrf
+                @method('PUT')
+
+                <h3 class="text-sm font-semibold text-slate-700 dark:text-slate-300">Ubah Status Secara Manual</h3>
+
+                <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Status Baru</label>
+                        <select name="status_barang" required
+                            class="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-lg text-slate-900 dark:text-white transition">
+                            <option value="aktif" {{ ($barang->status_barang ?? 'aktif') === 'aktif' ? 'selected' : '' }}>✅ Aktif</option>
+                            <option value="rusak_total" {{ $barang->status_barang === 'rusak_total' ? 'selected' : '' }}>🔴 Rusak Total</option>
+                            <option value="hilang" {{ $barang->status_barang === 'hilang' ? 'selected' : '' }}>⬛ Hilang</option>
+                            <option value="dihapuskan" {{ $barang->status_barang === 'dihapuskan' ? 'selected' : '' }}>⚫ Dihapuskan</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Catatan Status</label>
+                        <textarea name="catatan_status" rows="1" placeholder="Alasan atau keterangan perubahan..."
+                            class="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-lg text-slate-900 dark:text-white transition">{{ $barang->catatan_status }}</textarea>
+                    </div>
+                </div>
+
+                <div class="flex justify-end">
+                    <button type="submit"
+                        class="bg-slate-700 hover:bg-slate-900 dark:bg-slate-600 dark:hover:bg-slate-500 text-white px-6 py-2.5 rounded-lg text-sm font-medium transition shadow-sm">
+                        Simpan Status
+                    </button>
+                </div>
+            </form>
+
+        </div>
+        {{-- ============================================================ --}}
+
     </div>
 @endsection

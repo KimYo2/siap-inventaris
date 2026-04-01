@@ -41,6 +41,10 @@ Route::middleware(['web', Authenticate::class])->group(function () {
             App\Http\Controllers\Admin\TiketKerusakanController::class,
             'update'
         ])->name('admin.tiket.update');
+        Route::put('/admin/tiket/{id}/resolve', [
+            App\Http\Controllers\Admin\TiketKerusakanController::class,
+            'resolve'
+        ])->name('admin.tiket.resolve');
 
         // Admin Dashboard (New Migration)
         Route::get('/admin/dashboard', [App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('admin.dashboard');
@@ -51,6 +55,7 @@ Route::middleware(['web', Authenticate::class])->group(function () {
             'except' => ['show'],
         ]);
         Route::post('/admin/barang/import', [App\Http\Controllers\Admin\BarangController::class, 'import'])->name('admin.barang.import');
+        Route::put('/admin/barang/{id}/update-status', [App\Http\Controllers\Admin\BarangController::class, 'updateStatus'])->name('admin.barang.update-status');
 
         // Admin QR Label Printing
         Route::get('/admin/barang/{id}/qr-label', [App\Http\Controllers\Admin\QrLabelController::class, 'show'])->name('admin.barang.qr-label');

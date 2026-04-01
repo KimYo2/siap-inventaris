@@ -19,6 +19,32 @@
             <!-- Details -->
             <div class="p-6 space-y-6">
 
+                @php $isUnavailablePermanently = in_array($barang->status_barang, ['rusak_total', 'hilang', 'dihapuskan']); @endphp
+
+                @if($isUnavailablePermanently)
+                    <div class="flex items-start gap-3 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800/60 rounded-lg">
+                        <svg class="w-6 h-6 text-red-500 dark:text-red-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/>
+                        </svg>
+                        <div>
+                            <h4 class="font-semibold text-red-800 dark:text-red-200 mb-1">Barang Tidak Dapat Dipinjam</h4>
+                            <p class="text-sm text-red-700 dark:text-red-300">
+                                @if($barang->status_barang === 'rusak_total')
+                                    Barang ini dinyatakan <strong>rusak total</strong> dan tidak lagi dapat digunakan.
+                                @elseif($barang->status_barang === 'hilang')
+                                    Barang ini dinyatakan <strong>hilang</strong> dan tidak tersedia untuk peminjaman.
+                                @elseif($barang->status_barang === 'dihapuskan')
+                                    Barang ini telah <strong>dihapuskan</strong> dari inventaris aktif.
+                                @endif
+                            </p>
+                            @if($barang->catatan_status)
+                                <p class="text-xs text-red-600 dark:text-red-400 mt-1 italic">&ldquo;{{ $barang->catatan_status }}&rdquo;</p>
+                            @endif
+                        </div>
+                    </div>
+                @endif
+
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
                     <div>
                         <p class="text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">Nomor BMN</p>
@@ -29,7 +55,7 @@
                     <div>
                         <p class="text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">Kondisi</p>
                         <span
-                            class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium 
+                            class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
                                 {{ $barang->kondisi_badge_class }}">
                             {{ $barang->kondisi_label }}
                         </span>
@@ -40,7 +66,7 @@
                     <p class="text-sm font-medium text-slate-500 dark:text-slate-400 mb-3">Status Ketersediaan</p>
                     <div>
                         <span
-                            class="inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-medium 
+                            class="inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-medium
                                 {{ $barang->ketersediaan === 'tersedia' ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300' : 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300' }}">
                             {{ $barang->ketersediaan === 'tersedia' ? 'Tersedia' : 'Sedang Dipinjam' }}
                         </span>
@@ -88,7 +114,16 @@
 
             <!-- Action Button -->
             <div class="p-6 bg-slate-50 dark:bg-slate-800/50 border-t border-slate-200 dark:border-slate-700">
-                @if($isBorrowing)
+                @if($isUnavailablePermanently)
+                    <button type="button" disabled
+                        class="w-full bg-slate-200 dark:bg-slate-700 text-slate-400 dark:text-slate-500 font-semibold py-3 px-4 rounded-lg cursor-not-allowed flex items-center justify-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/>
+                        </svg>
+                        Tidak Dapat Dipinjam
+                    </button>
+                @elseif($isBorrowing)
                     <!-- User is currently borrowing this item -->
                     <a href="{{ route('return.index') }}?code={{ $barang->nomor_bmn_full }}"
                         class="w-full bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-semibold py-3 px-4 rounded-lg transition duration-200 shadow-sm hover:shadow-md flex items-center justify-center gap-2">
@@ -156,7 +191,7 @@
 
                 if (result.success) {
                     // Show success feedback (using simple alert for now, can be improved to Toast if available in layout)
-                    // Assuming layout has showToast or similar from legacy scripts? 
+                    // Assuming layout has showToast or similar from legacy scripts?
                     // Let's use standard alert for safety or reuse legacy showToast if included in layouts.app
 
                     // Check if showToast exists (from legacy main.js)
